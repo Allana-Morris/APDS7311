@@ -3,6 +3,7 @@ import express from "express";
 import https from "https";
 import fs from "fs";
 import posts from "./routes/post.mjs"
+import users from "./routes/User.mjs"; 
 import cors from "cors"
 
 const PORT = 3001;
@@ -14,6 +15,8 @@ const app = express();
 }*/
 
 app.use(cors())
+app.use(express.json());
+
 app.use((reg, res, next)=>{
     res.setHeader('Access-Control-Allow-Origin','*');
     res.setHeader('Access-Control-Allow-Headers','*');
@@ -24,6 +27,11 @@ app.use((reg, res, next)=>{
 app.use("/post", posts);
 app.route("/post", posts)
 
+app.use("/user", users);
+
 let server = https.createServer( app)
-console.log(PORT)
-server.listen(PORT)
+
+// Server listening
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
