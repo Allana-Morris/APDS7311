@@ -3,16 +3,16 @@ import express from "express";
 import https from "https";
 import fs from "fs";
 import posts from "./routes/post.mjs"
-import users from "./routes/User.mjs"; 
+import users from "./models/User.mjs"; 
 import cors from "cors"
 
 const PORT = 3001;
 const app = express();
 
-/*const options = {
+const options = {
     key: fs.readFileSync('keys/privatekey.pem'),
     cert: fs.readFileSync('keys/certificate.pem')
-}*/
+}
 
 app.use(cors())
 app.use(express.json());
@@ -29,7 +29,7 @@ app.route("/post", posts)
 
 app.use("/user", users);
 
-let server = https.createServer( app)
+let server = https.createServer(options, app)
 
 // Server listening
 server.listen(PORT, () => {
