@@ -1,53 +1,38 @@
-/* src/components/CustomerRegistration/styles.css */
+/* src/components/CustomerRegistration/RegisterStyles.css */
 
-.container {
+.registration-form {
     max-width: 400px;
-    margin: auto;
+    margin: 0 auto;
     padding: 20px;
-    border: 2px solid #ddd;
-    border-radius: 15px;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-}
-
-.header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.form {
-    display: flex;
-    flex-direction: column;
-}
-
-.row {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .form-row {
     display: flex;
     justify-content: space-between;
     margin-bottom: 15px;
-}
-
-.input {
-    flex: 1;
+  }
+  
+  .form-input {
+    width: 48%; /* Adjust width as needed */
     padding: 10px;
-    margin: 5px;
-    border-radius: 5px;
     border: 1px solid #ccc;
-}
-
-.submitButton {
+    border-radius: 4px;
+  }
+  
+  .submit-button {
+    width: 100%;
     padding: 10px;
-    border-radius: 5px;
+    background-color: #28a745; /* Green button */
+    color: white;
     border: none;
-    background-color: #007bff;
-    color: #fff;
+    border-radius: 4px;
     cursor: pointer;
-}
-
-.loginLinkContainer {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.loginLink {
-    text-decoration: none;
-    color: #007bff;
-}
+  }
+  
+  .submit-button:hover {
+    background-color: #218838; /* Darker green on hover */
+  }
+  
