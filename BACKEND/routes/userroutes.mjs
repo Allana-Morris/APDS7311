@@ -1,9 +1,16 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import validator from 'validator';
-import db from "../db/conn.mjs"; // Adjust the path as necessary
+import db from "../db/conn.mjs";
+import User from "../models/User.mjs";
+import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 const router = express.Router();
+const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
+
+router.get("/", async(req, res)=>{
+  res.status(200).send("Peanits");
+  });
 
 // User registration route
 router.post('/register', async (req, res) => {
@@ -16,26 +23,26 @@ router.post('/register', async (req, res) => {
     const southAfricanIDPattern = /^(?!000000)(\d{2})(\d{2})(\d{2})(\d{4})([01])(\d)$/; // SA ID validation
 
     if (!namePattern.test(firstName) || !namePattern.test(lastName)) {
-        return res.status(400).json({ message: 'Invalid name.'});
+        return res.status(400).json({ message: 'Invalid name.' });
     }
     
     if (!emailPattern.test(email)) {
-        return res.status(400).json({ message: 'Invalid email.'});
+        return res.status(400).json({ message: 'Invalid email.' });
     }
 
     if (!accountNumberPattern.test(accountNumber)) {
-        return res.status(400).json({ message: 'Invalid bank account number.'});
+        return res.status(400).json({ message: 'Invalid bank account number.' });
     }
 
     if (!southAfricanIDPattern.test(southAfricanID)) {
-        return res.status(400).json({ message: 'Invalid South African ID.'});
+        return res.status(400).json({ message: 'Invalid South African ID.' });
     }
 
     // Password validation
     const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/; // At least 12 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
 
     if (!passwordPattern.test(password)) {
-        return res.status(400).json({ message: 'Password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.' });
+       return res.status(400).json({ message: 'Password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.' });
     }
 
     if (password !== confirmPassword) {
@@ -44,9 +51,9 @@ router.post('/register', async (req, res) => {
 
     try {
         // Check if user already exists
-        const existingUser = await db.collection('users').findOne({ email });
+        const existingUser = await db.collection('Users').findOne({ email });
         if (existingUser) {
-           // return res.status(400).json({ message: 'User already exists.' });
+            return res.status(400).json({ message: 'User already exists.' });
         }
 
         // Salt and hash the password
@@ -63,7 +70,7 @@ router.post('/register', async (req, res) => {
             southAfricanID,
         };
 
-      //  await db.collection('users').insertOne(newUser);
+        await db.collection('Users').insertOne(newUser);
 
         res.status(201).json({ message: 'User registered successfully!' });
     } catch (error) {
@@ -71,5 +78,36 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ message: 'Internal server error.' });
     }
 });
+
+// Login route
+router.get("/login", async (req, res) => {
+    const { accountNumber, password } = req.body;
+  
+    try {
+      // Find the user by account number
+      const user = await User.findOne({ accountNumber });
+  
+      if (!user) {
+        return res.status(400).json("Invalid account number or password");
+      }
+  
+    // Compare the provided password with the stored hashed password using the User model's method
+    const isMatch = await user.comparePassword(password);
+  
+      if (!isMatch) {
+        return res.status(400).json("Invalid account number or password");
+      }
+  
+      // Generate a JWT token
+      const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: "1h" });
+  
+      // Return the JWT token
+      res.json({ token });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json("Server error");
+    }
+  });
+
 
 export default router;

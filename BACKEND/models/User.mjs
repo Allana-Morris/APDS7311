@@ -3,8 +3,12 @@ import bcrypt from 'bcryptjs';
 
 // Define the user schema
 const userSchema = new mongoose.Schema({
-  accountNumber: { type: String, required: true, unique: true },
-  password: { type: String, required: true }, // This will store the hashed password
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    accountNumber: { type: String, required: true, unique: true  },
+    idNumber: { type: String, required: true, unique: true  }
 });
 
 // Pre-save middleware to hash the password before saving to the database

@@ -3,6 +3,7 @@ import express from "express";
 import https from "https";
 import fs from "fs";
 import posts from "./routes/post.mjs"
+import userstuff from "./routes/userroutes.mjs"
 import users from "./models/User.mjs"; 
 import cors from "cors"
 
@@ -26,6 +27,8 @@ app.use((reg, res, next)=>{
 
 app.use("/post", posts);
 app.route("/post", posts)
+
+app.use("/users", userstuff);
 
 app.use("/user", users);
 
