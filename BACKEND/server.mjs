@@ -30,7 +30,7 @@ app.route("/post", posts)
 
 app.use("/users", userstuff);
 
-app.use("/user", users);
+//app.use("/user", users);
 
 let server = https.createServer(options, app)
 

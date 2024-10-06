@@ -1,9 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import db from "../db/conn.mjs";
-import User from "../models/User.mjs";
 import jwt from "jsonwebtoken";
-import { ObjectId } from "mongodb";
 import expressBrute from "express-brute"
 
 const router = express.Router();
