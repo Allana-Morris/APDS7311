@@ -4,8 +4,12 @@ import db from "../db/conn.mjs";
 import User from "../models/User.mjs";
 import jwt from "jsonwebtoken";
 import { ObjectId } from "mongodb";
+import expressBrute from "express-brute"
 
 const router = express.Router();
+var store = new expressBrute.MemoryStore();
+var bruteforce = new expressBrute(store);
+
 const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
 
 router.get("/", async(req, res)=>{
@@ -80,12 +84,14 @@ router.post('/register', async (req, res) => {
 });
 
 // Login route
-router.get("/login", async (req, res) => {
+/*router.post("/login", bruteforce.prevent, async (req, res) => {
     const { accountNumber, password } = req.body;
   
     try {
       // Find the user by account number
+
       const user = await User.findOne({ accountNumber });
+
   
       if (!user) {
         return res.status(400).json("Invalid account number or password");
@@ -108,6 +114,41 @@ router.get("/login", async (req, res) => {
       res.status(500).json("Server error");
     }
   });
+  */
+  
+  router.post("/login", bruteforce.prevent, async (req, res) =>
+    {
+        const {accountNumber, password} = req.body
+        console.log(accountNumber + " " + password)
+
+        try 
+        {
+            const collection = await db.collection("Users")
+            const user = await collection.findOne({accountNumber});
+
+            if (!user)
+            {
+                return res.status(401).json({message: "Auth failed"});
+            }
+
+            const passwordMatch = await bcrypt.compare(password, user.password)
+
+            if (!passwordMatch)
+            {
+                return res.status(401).json({message:"auth failed"})
+            }
+            else{
+                const token = jwt.sign({usernmame:req.body.usernmame, password:req.body.password}, "tis secret", {expiresIn:"1h"})
+                res.status(200).json({message: "authentication succ", token: token, name: req.body.name});
+                console.log("new token is", token)
+            }
+        }
+        catch (error)
+        {
+            console.error("Login error:", error)
+            res.status(500).json({message: "Login"} )
+        }
+    });
 
 
 export default router;
