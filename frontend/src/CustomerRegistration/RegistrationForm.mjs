@@ -35,6 +35,7 @@ function RegistrationForm() {
           lastName, 
           email, 
           password, 
+          confirmPassword, 
           accountNumber, 
           idNumber 
         }),
@@ -46,14 +47,15 @@ function RegistrationForm() {
       const data = await response.json();
 
       console.log("menlo")
-
       if (response.ok) {
         alert('Registration successful!');
         // Redirect to the login page after successful registration
         navigate('/login'); // Use navigate to redirect
       } else {
         // Display an error message if registration failed
-        alert('Registration failed: ' + data.message);
+        // Access the error message from the data object
+        const errorMessage = data.errorMessage;
+        alert('Registration failed: ' + errorMessage);
       }
     } catch (error) {
       console.error('Error:', error);

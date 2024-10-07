@@ -43,8 +43,9 @@ router.get("/", async(req, res)=>{
 
 // User registration route
 router.post('/register', async (req, res) => {
-    const { firstName, lastName, email, password, confirmPassword, accountNumber, southAfricanID } = req.body;
-
+    const { firstName, lastName, email, password, confirmPassword, accountNumber, idNumber } = req.body;
+    console.log("Your Mom")
+    console.log({firstName, lastName, email, password, confirmPassword, accountNumber, idNumber})
     // Input validation
     const namePattern = /^[a-zA-Z\s]+$/; // Allows only letters and spaces
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co\.za)$/ // Valid email format
@@ -63,8 +64,10 @@ router.post('/register', async (req, res) => {
         return res.status(400).json({ message: 'Invalid bank account number.' });
     }
 
-    if (!southAfricanIDPattern.test(southAfricanID)) {
-        return res.status(400).json({ message: 'Invalid South African ID.' });
+    if (!southAfricanIDPattern.test(idNumber)) {
+        console.log({idNumber})
+        return res.status(400).json({ message: 'Invalid South African ID number.'});
+        // return res.status(400).json({ message: 'Invalid South African ID.' });
     }
 
     // Password validation
@@ -96,7 +99,7 @@ router.post('/register', async (req, res) => {
             email,
             password: hashedPassword, // Store hashed password
             accountNumber,
-            southAfricanID,
+            idNumber,
         };
 
         await db.collection('Users').insertOne(newUser);
