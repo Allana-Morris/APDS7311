@@ -10,6 +10,25 @@ var bruteforce = new expressBrute(store);
 
 const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
 
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer token
+
+  if (!token) {
+      return res.status(401).json({ message: 'No token provided.' });
+  }
+
+  jwt.verify(token, jwtSecret, (err, user) => {
+      if (err) {
+          return res.status(403).json({ message: 'Invalid token.' });
+      }
+
+      req.user = user; // Attach user info to request
+      next();
+  });
+};
+
+
 router.get("/", async(req, res)=>{
   res.status(200).send("Peanits");
   });
@@ -81,38 +100,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Login route
-/*router.post("/login", bruteforce.prevent, async (req, res) => {
-    const { accountNumber, password } = req.body;
-  
-    try {
-      // Find the user by account number
 
-      const user = await User.findOne({ accountNumber });
-
-  
-      if (!user) {
-        return res.status(400).json("Invalid account number or password");
-      }
-  
-    // Compare the provided password with the stored hashed password using the User model's method
-    const isMatch = await user.comparePassword(password);
-  
-      if (!isMatch) {
-        return res.status(400).json("Invalid account number or password");
-      }
-  
-      // Generate a JWT token
-      const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: "1h" });
-  
-      // Return the JWT token
-      res.json({ token });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json("Server error");
-    }
-  });
-  */
   
   router.post("/login", bruteforce.prevent, async (req, res) =>
     {
@@ -148,5 +136,64 @@ router.post('/register', async (req, res) => {
         }
     });
 
+    router.get("/dash", authenticateToken, async (req, res) => {
+      try {
+          const userId = req.user.id; // Get user ID from the verified token
+  
+          // Fetch user-specific data from the database
+          const user = await db.collection('Users').findOne({ _id: userId });
+  
+          if (!user) {
+              return res.status(404).json({ message: "User not found" });
+          }
+  
+          // Send user data as response
+          res.status(200).json({
+              message: "Welcome to your dashboard!",
+              user: {
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  email: user.email,
+                  accountNumber: user.accountNumber
+              }
+          });
+      } catch (error) {
+          console.error("Error fetching dashboard data:", error);
+          res.status(500).json({ message: "Internal server error" });
+      }
+  });
 
 export default router;
+
+// Login route
+/*router.post("/login", bruteforce.prevent, async (req, res) => {
+    const { accountNumber, password } = req.body;
+  
+    try {
+      // Find the user by account number
+
+      const user = await User.findOne({ accountNumber });
+
+  
+      if (!user) {
+        return res.status(400).json("Invalid account number or password");
+      }
+  
+    // Compare the provided password with the stored hashed password using the User model's method
+    const isMatch = await user.comparePassword(password);
+  
+      if (!isMatch) {
+        return res.status(400).json("Invalid account number or password");
+      }
+  
+      // Generate a JWT token
+      const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: "1h" });
+  
+      // Return the JWT token
+      res.json({ token });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json("Server error");
+    }
+  });
+  */
