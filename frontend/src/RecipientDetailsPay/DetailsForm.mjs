@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './DetailsPayment.css';
 
-function App() {
+function DetailsForm() {
   //-----------------------------------------------------------------------------------------------
   // Decalare Variables
   //-----------------------------------------------------------------------------------------------
@@ -125,4 +125,4 @@ function App() {
   );
 }
 
-export default RecipientDetailsPay;
+export default DetailsForm;

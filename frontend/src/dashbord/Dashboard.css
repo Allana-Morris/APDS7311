@@ -1,0 +1,100 @@
+/* Dashboard container */
+.dashboard-container {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  /* Header styling */
+  .dashboard-header {
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+  }
+  
+  /* Layout for body: side menu and main dashboard */
+  .dashboard-body {
+    display: flex;
+    margin-top: 20px;
+  }
+  
+  /* Side menu styling */
+  .side-menu {
+    width: 200px;
+    border-right: 1px solid #ccc;
+  }
+  
+  .side-menu ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .side-menu li {
+    margin: 10px 0;
+    cursor: pointer;
+  }
+  
+  /* Main dashboard area */
+  .dashboard-main {
+    flex: 1;
+    padding-left: 20px;
+  }
+  
+  /* Payment buttons styling */
+  .payment-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .local-payment, .intl-payment {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .local-payment:hover, .intl-payment:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Banking details styling */
+  .banking-details {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .banking-details p {
+    margin: 5px 0;
+  }
+  
+  /* Payment receipts styling */
+  .payment-receipts {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .receipt {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+  }
+  
+  /* Button for "Pay again" */
+  .receipt button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .receipt button:hover {
+    background-color: #218838;
+  }
+  
