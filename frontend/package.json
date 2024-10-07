@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start-app": "cd src && node App.mjs"
+  },
   "dependencies": {
     "react-router-dom": "^6.26.2"
   }

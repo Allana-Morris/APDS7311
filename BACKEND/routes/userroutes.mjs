@@ -22,7 +22,7 @@ router.post('/register', async (req, res) => {
     const namePattern = /^[a-zA-Z\s]+$/; // Allows only letters and spaces
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co\.za)$/ // Valid email format
     const accountNumberPattern = /^\d{6,11}$/; //South African bank account number validation (6 to 11 digits)
-    const southAfricanIDPattern = /^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{4}[01]\d$/; // SA ID validation
+    const southAfricanIDPattern = /^(?!000000)(\d{2})(\d{2})(\d{2})(\d{4})([01])(\d)(\d)$/; // SA ID validation
 
     if (!namePattern.test(firstName) || !namePattern.test(lastName)) {
         return res.status(400).json({ message: 'Invalid name.' });
