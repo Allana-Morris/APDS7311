@@ -65,7 +65,7 @@ router.post('/register', async (req, res) => {
     }
 
     if (!southAfricanIDPattern.test(idNumber)) {
-        console.log({idNumber})
+       // console.log({idNumber})
         return res.status(400).json({ message: 'Invalid South African ID number.'});
         // return res.status(400).json({ message: 'Invalid South African ID.' });
     }

@@ -10,8 +10,8 @@ function App() {
       {/* Wrap the Routes with BrowserRouter */}
       <BrowserRouter>
         <Routes>
-          <Route exact path="/reg" element={<Reg />} />
-          <Route exact path="/" element={<Log />} />
+          <Route exact path="/" element={<Reg />} />
+          <Route exact path="/login" element={<Log />} />
         </Routes>
       </BrowserRouter>
     </div>

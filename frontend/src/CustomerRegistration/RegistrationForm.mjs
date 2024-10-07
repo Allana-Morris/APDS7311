@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link } from 'react-router-dom';
 import './RegisterStyles.css'; // Import the CSS file
 
 function RegistrationForm() {
@@ -65,6 +66,7 @@ function RegistrationForm() {
 
   return (
     <form className="registration-form" onSubmit={handleSubmit}>
+      <h2>Customer Registration Form</h2>
       <div className="form-row">
         <input
           className="form-input"
@@ -130,6 +132,13 @@ function RegistrationForm() {
         />
       </div>
       <button className="submit-button" type="submit">Submit</button>
+      <div>
+        
+      </div>
+      <div><Link to="/login">
+          An existing customer? Click to Login
+        </Link>
+    </div>
     </form>
   );
 }
