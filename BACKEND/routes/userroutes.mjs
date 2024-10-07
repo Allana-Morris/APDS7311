@@ -92,6 +92,8 @@ router.post('/register', async (req, res) => {
         const saltRounds = 10; // Number of salt rounds
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+        const balance = 0;
+
         // Create a new user
         const newUser = {
             firstName,
@@ -100,6 +102,7 @@ router.post('/register', async (req, res) => {
             password: hashedPassword, // Store hashed password
             accountNumber,
             idNumber,
+            balance
         };
 
         await db.collection('Users').insertOne(newUser);
@@ -176,6 +179,60 @@ router.post('/register', async (req, res) => {
           res.status(500).json({ message: "Internal server error" });
       }
   });
+  router.post("/payment", checkAuth, async (req, res) => {
+    try {
+        const { type, recName, recBank, recAccNo, amount, swift, branch, currency } = req.body; // Extract payment details from the request body
+        const senderAccountNumber = req.user.accountNumber; // Get the logged-in user's account number from the token
+
+        // Validate input
+        if (type === "local") {
+            if (!type || !recName || !recBank || !recAccNo || !amount || !branch) {
+                return res.status(400).json({ message: "All fields are required for local payment." });
+            }
+        } else {
+            if (!type || !recName || !recBank || !recAccNo || !amount || !swift || !currency) {
+                return res.status(400).json({ message: "All fields are required for international payment." });
+            }
+        }
+
+        // Fetch the user from the database
+        const user = await db.collection('Users').findOne({ accountNumber: senderAccountNumber });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Create a transaction object
+        const transaction = {
+            transactionId: `txn_${Date.now()}`, // Create a unique transaction ID
+            type,
+            sender: senderAccountNumber, // Store the sender's account number
+            recipient: {
+                name: recName,
+                bank: recBank,
+                accountNumber: recAccNo,
+            },
+            amount,
+            swift,
+            branch,
+            currency,
+            date: new Date(),
+        };
+
+        // Save the transaction in the Transactions collection
+        await db.collection('Transactions').insertOne(transaction);
+
+        res.status(201).json({ message: "Transaction added successfully!", transaction });
+    } catch (error) {
+        console.error("Error processing payment:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+});
+
+
+
+
+
 
 export default router;
 

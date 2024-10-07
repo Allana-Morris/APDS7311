@@ -1,12 +1,42 @@
-import React from 'react';
 import './Dashboard.css';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-const Dashboard = () => {
+function Dashboard() {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      fetch('https://localhost:3001/users/dash', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        setUser(data.user); // Set the fetched user data
+      })
+      .catch(err => console.error('Error fetching user data:', err));
+    }
+  }, []);
+
+  if (!user) {
+    return <p>Loading...</p>;
+  }
+
+  const handleLocalPaymentClick = () => {
+    navigate('/payment'); // Navigate to /payment when button is clicked
+  };
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Customer Dashboard</h1>
-        <h2>Hello, [Customer's Name]</h2>
+        {/* Display the user's first and last name here */}
+        <h2>Hello, {user.firstName} {user.lastName}</h2>
       </header>
       
       <div className="dashboard-body">
@@ -20,13 +50,15 @@ const Dashboard = () => {
         
         <div className="dashboard-main">
           <div className="payment-buttons">
-            <button className="local-payment">Make Local Payment</button>
+            <button className="local-payment" onClick={handleLocalPaymentClick}>
+              Make Local Payment
+            </button>
             <button className="intl-payment">Make International Payment</button>
           </div>
           
           <div className="banking-details">
             <h3>Banking Details</h3>
-            <p>Current Acc: XXXXXXXXXXXX</p>
+            <p>Current Acc: {user.accountNumber}</p>
             <p>Available Balance: $1500.00</p>
           </div>
 

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import './LoginStyle.css';
 
 function LoginForm() {
   const [accountNumber, setAccountNumber] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate hook for redirection
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,9 +26,12 @@ function LoginForm() {
         // Store the JWT token in local storage
         localStorage.setItem('jwt', data.token);
         alert('Login successful!');
+        
+        // Navigate to the dashboard page after successful login
+        navigate('/dash');
       } else {
         // Display an error message if login failed
-        alert('Login failed: ' + data);
+        alert('Login failed: ' + data.message);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -66,5 +71,3 @@ function LoginForm() {
 }
 
 export default LoginForm;
-
-

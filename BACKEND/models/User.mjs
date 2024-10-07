@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     accountNumber: { type: String, required: true, unique: true  },
-    idNumber: { type: String, required: true, unique: true  }
+    idNumber: { type: String, required: true, unique: true  },
+    Balance:{type: String, required: true, unique: true}
 });
 
 // Pre-save middleware to hash the password before saving to the database
