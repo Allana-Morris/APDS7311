@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import db from "../db/conn.mjs";
 import jwt from "jsonwebtoken";
 import expressBrute from "express-brute"
+import checkAuth from '../checkAuth.mjs';
 
 const router = express.Router();
 var store = new expressBrute.MemoryStore();
@@ -12,7 +13,14 @@ const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer token
+  //const token = authHeader && authHeader.split(' ')[1]; // Bearer token
+
+  const token = jwt.sign(
+    { id: user._id, accountNumber: user.accountNumber }, // Include relevant user info in the token
+    jwtSecret, // Use the secret from environment or fallback
+    { expiresIn: "1h" } // Set expiration
+);
+
 
   if (!token) {
       return res.status(401).json({ message: 'No token provided.' });
@@ -124,9 +132,9 @@ router.post('/register', async (req, res) => {
                 return res.status(401).json({message:"auth failed"})
             }
             else{
-                const token = jwt.sign({usernmame:req.body.usernmame, password:req.body.password}, "tis secret", {expiresIn:"1h"})
+                const token = jwt.sign({accountNumber: accountNumber}, jwtSecret, {expiresIn:"1h"})
                 res.status(200).json({message: "authentication succ", token: token, name: req.body.name});
-                console.log("new token is", token)
+                console.log("new token is", token )
             }
         }
         catch (error)
@@ -136,12 +144,15 @@ router.post('/register', async (req, res) => {
         }
     });
 
-    router.get("/dash", authenticateToken, async (req, res) => {
+    router.get("/dash", checkAuth, async (req, res) => {
       try {
-          const userId = req.user.id; // Get user ID from the verified token
+        console.log(req.user)
+          
+        const accountNumber = req.user.accountNumber; // Get account number from the verified token
+        console.log("Account Number:", accountNumber);
   
           // Fetch user-specific data from the database
-          const user = await db.collection('Users').findOne({ _id: userId });
+          const user = await db.collection('Users').findOne({ accountNumber: accountNumber });
   
           if (!user) {
               return res.status(404).json({ message: "User not found" });
