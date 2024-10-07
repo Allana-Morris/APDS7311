@@ -3,12 +3,39 @@ import bcrypt from 'bcrypt';
 import db from "../db/conn.mjs";
 import jwt from "jsonwebtoken";
 import expressBrute from "express-brute"
+import checkAuth from '../checkAuth.mjs';
 
 const router = express.Router();
 var store = new expressBrute.MemoryStore();
 var bruteforce = new expressBrute(store);
 
 const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  //const token = authHeader && authHeader.split(' ')[1]; // Bearer token
+
+  const token = jwt.sign(
+    { id: user._id, accountNumber: user.accountNumber }, // Include relevant user info in the token
+    jwtSecret, // Use the secret from environment or fallback
+    { expiresIn: "1h" } // Set expiration
+);
+
+
+  if (!token) {
+      return res.status(401).json({ message: 'No token provided.' });
+  }
+
+  jwt.verify(token, jwtSecret, (err, user) => {
+      if (err) {
+          return res.status(403).json({ message: 'Invalid token.' });
+      }
+
+      req.user = user; // Attach user info to request
+      next();
+  });
+};
+
 
 router.get("/", async(req, res)=>{
   res.status(200).send("Peanits");
@@ -81,6 +108,74 @@ router.post('/register', async (req, res) => {
     }
 });
 
+
+  
+  router.post("/login", bruteforce.prevent, async (req, res) =>
+    {
+        const {accountNumber, password} = req.body
+        console.log(accountNumber + " " + password)
+
+        try 
+        {
+            const collection = await db.collection("Users")
+            const user = await collection.findOne({accountNumber});
+
+            if (!user)
+            {
+                return res.status(401).json({message: "Auth failed"});
+            }
+
+            const passwordMatch = await bcrypt.compare(password, user.password)
+
+            if (!passwordMatch)
+            {
+                return res.status(401).json({message:"auth failed"})
+            }
+            else{
+                const token = jwt.sign({accountNumber: accountNumber}, jwtSecret, {expiresIn:"1h"})
+                res.status(200).json({message: "authentication succ", token: token, name: req.body.name});
+                console.log("new token is", token )
+            }
+        }
+        catch (error)
+        {
+            console.error("Login error:", error)
+            res.status(500).json({message: "Login"} )
+        }
+    });
+
+    router.get("/dash", checkAuth, async (req, res) => {
+      try {
+        console.log(req.user)
+          
+        const accountNumber = req.user.accountNumber; // Get account number from the verified token
+        console.log("Account Number:", accountNumber);
+  
+          // Fetch user-specific data from the database
+          const user = await db.collection('Users').findOne({ accountNumber: accountNumber });
+  
+          if (!user) {
+              return res.status(404).json({ message: "User not found" });
+          }
+  
+          // Send user data as response
+          res.status(200).json({
+              message: "Welcome to your dashboard!",
+              user: {
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  email: user.email,
+                  accountNumber: user.accountNumber
+              }
+          });
+      } catch (error) {
+          console.error("Error fetching dashboard data:", error);
+          res.status(500).json({ message: "Internal server error" });
+      }
+  });
+
+export default router;
+
 // Login route
 /*router.post("/login", bruteforce.prevent, async (req, res) => {
     const { accountNumber, password } = req.body;
@@ -113,40 +208,3 @@ router.post('/register', async (req, res) => {
     }
   });
   */
-  
-  router.post("/login", bruteforce.prevent, async (req, res) =>
-    {
-        const {accountNumber, password} = req.body
-        console.log(accountNumber + " " + password)
-
-        try 
-        {
-            const collection = await db.collection("Users")
-            const user = await collection.findOne({accountNumber});
-
-            if (!user)
-            {
-                return res.status(401).json({message: "Auth failed"});
-            }
-
-            const passwordMatch = await bcrypt.compare(password, user.password)
-
-            if (!passwordMatch)
-            {
-                return res.status(401).json({message:"auth failed"})
-            }
-            else{
-                const token = jwt.sign({usernmame:req.body.usernmame, password:req.body.password}, "tis secret", {expiresIn:"1h"})
-                res.status(200).json({message: "authentication succ", token: token, name: req.body.name});
-                console.log("new token is", token)
-            }
-        }
-        catch (error)
-        {
-            console.error("Login error:", error)
-            res.status(500).json({message: "Login"} )
-        }
-    });
-
-
-export default router;
