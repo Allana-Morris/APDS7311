@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import './DetailsPayment.css';
 
 function DetailsForm() {
@@ -10,6 +11,8 @@ function DetailsForm() {
     swiftCode: '',
     currency: 'USD' // Default currency set to USD
   });
+
+  const navigate = useNavigate(); // Initialize useNavigate for redirecting
 
   // Get user input
   const handleChange = (e) => {
@@ -60,6 +63,8 @@ function DetailsForm() {
       const result = await response.json();
       if (response.ok) {
         alert(`Transaction successful: ${result.message}`);
+        navigate('/dashboard'); // Navigate to the dashboard after successful payment
+
       } else {
         alert(`Error: ${result.message}`);
       }
@@ -69,7 +74,7 @@ function DetailsForm() {
     }
   };
 
-  // Handle form reset
+  // Handle form reset and navigate to dashboard
   const handleReset = () => {
     setFormData({
       recipientName: '',
@@ -77,8 +82,10 @@ function DetailsForm() {
       accountNumber: '',
       amount: '',
       swiftCode: '',
-      currency: 'ZAR' // Reset currency to default
+      currency: 'USD' // Reset currency to default
     });
+
+    navigate('/home'); // Redirect to /home when cancel is clicked
   };
 
   return (
