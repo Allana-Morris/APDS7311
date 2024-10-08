@@ -36,7 +36,7 @@ jobs:
         run: |
           cd frontend  # Change to the directory where the React app is located
           npm install
-
+          
       # Run build step for frontend
       - name: Build frontend project
         run: |
@@ -75,6 +75,12 @@ jobs:
         run: |
           cd BACKEND  # Change to the directory where the Node.js app is located
           npm install
+
+      # Run build step for backend (if needed)
+      - name: Run backend build
+        run: |
+          cd BACKEND  # Change to the directory where the Node.js app is located
+          npm run build || echo 'No build step defined'
 
       # Run tests for backend
       - name: Run backend tests
