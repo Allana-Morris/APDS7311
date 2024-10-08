@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  frontend:
+  build:
     runs-on: ubuntu-latest
 
     env:
@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
 
       # Set up Node.js environment with version 20
-      - name: Set up Node.js for Frontend
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'  # Ensure Node.js 20 is used
@@ -31,25 +31,19 @@ jobs:
       - name: Clear Node.js cache
         run: npm cache clean --force
 
-      # Install dependencies for the frontend
-      - name: Install frontend dependencies
+      # Install dependencies
+      - name: Install dependencies
         run: |
-          cd frontend  # Change to the directory where the React app is located
+          cd apds7311/backend  # Change to the correct directory
           npm install
 
-      # Run build step for frontend
-      - name: Build frontend project
+      # Run the build step
+      - name: Build project
         run: |
-          cd frontend  # Change to the directory where the React app is located
+          cd apds7311/backend  # Change to the correct directory
           npm run build
 
-      # Run tests for frontend
-      - name: Run frontend tests
-        run: |
-          cd frontend  # Change to the directory where the React app is located
-          npm test
-
-  backend:
+  test:
     runs-on: ubuntu-latest
 
     env:
@@ -61,29 +55,56 @@ jobs:
         uses: actions/checkout@v3
 
       # Set up Node.js environment with version 20
-      - name: Set up Node.js for Backend
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Ensure Node.js 20 is used
+          node-version: '20'
 
       # Clear Node.js cache
       - name: Clear Node.js cache
         run: npm cache clean --force
 
-      # Install dependencies for the backend
-      - name: Install backend dependencies
+      # Install dependencies
+      - name: Install dependencies
         run: |
-          cd backend  # Change to the directory where the Node.js app is located
+          cd apds7311/backend  # Change to the correct directory
           npm install
 
-      # Run tests for backend
-      - name: Run backend tests
+      # Run tests
+      - name: Run tests
         run: |
-          cd backend  # Change to the directory where the Node.js app is located
+          cd apds7311/backend  # Change to the correct directory
           npm test
 
-      # Run security scan for backend
-      - name: Run npm audit for backend
+  security_scan:
+    runs-on: ubuntu-latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true  # Enforce Node.js 20
+
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Node.js environment with version 20
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # Clear Node.js cache
+      - name: Clear Node.js cache
+        run: npm cache clean --force
+
+      # Install dependencies
+      - name: Install dependencies
         run: |
-          cd backend  # Change to the directory where the Node.js app is located
+          cd apds7311/backend  # Change to the correct directory
+          npm install
+
+      # Run npm audit to scan for vulnerabilities
+      - name: Run npm audit
+        run: |
+          cd apds7311/backend  # Change to the correct directory
           npm audit --audit-level=high
