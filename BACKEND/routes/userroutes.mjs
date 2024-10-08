@@ -90,7 +90,7 @@ router.post('/', async (req, res) => {
 
     
         // Check if user already exists
-        const existingUser = await db.collection('Users').findOne({ email });
+        const existingUser = await db.collection('Users').findOne({ accountNumber });
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists.' });
         }
