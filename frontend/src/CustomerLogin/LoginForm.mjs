@@ -25,17 +25,17 @@ function LoginForm() {
       if (response.ok) {
         // Store the JWT token in local storage
         localStorage.setItem('jwt', data.token);
-       // alert('Login successful!');
+        alert('Login successful!');
         
         // Navigate to the dashboard page after successful login
         navigate('/Home');
       } else {
         // Display an error message if login failed
-       // alert('Login failed: ' + data.message);
+        alert('Login failed: ' + data.message);
       }
     } catch (error) {
       console.error('Error:', error);
-     // alert('Login error: ' + error.message);
+      alert('Login error: ' + error.message);
     }
   };
 
