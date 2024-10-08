@@ -50,3 +50,24 @@ A demonstration video of the application in use is available on YouTube [Unliste
 1. Clone the repository:
    ```bash
    gh repo clone Allana-Morris/APDS7311
+2. Download node modules for backend:
+   ```bash
+   Create a terminal within visual studio and enter the following:
+
+   cd backend
+   npm i
+3. Download node modules for frontend:
+   ```bash
+   Create a new terminal within visual studio and enter the following:
+
+   cd frontend
+   npm i
+### Run steps
+1. Create a terminal and run backend:
+   ```bash
+   cd backend
+   npm run dev
+2. Create a new terminal and run frontend:
+   ```bash
+   cd frontend
+   npm start
