@@ -49,5 +49,4 @@ A demonstration video of the application in use is available on YouTube [Unliste
 ### Installation Steps
 1. Clone the repository:
    ```bash
-   git clone 
-   cd
+   gh repo clone Allana-Morris/APDS7311
