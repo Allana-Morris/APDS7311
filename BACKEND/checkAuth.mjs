@@ -10,7 +10,7 @@ const checkAuth = (req, res, next) => {
         const decoded = jwt.verify(token, secret); // Verify the token using your secret key
         
         req.user = decoded; // Attach the decoded token to the request object
-        console.log(decoded)
+        
         next(); // If token is valid, proceed to the next middleware
     } catch (error) {
         res.status(401).json({

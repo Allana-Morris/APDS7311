@@ -120,7 +120,6 @@ router.post('/', async (req, res) => {
   router.post("/Login", bruteforce.prevent, async (req, res) =>
     {
         const {accountNumber, password} = req.body
-        console.log(accountNumber + " " + password)
 
         try 
         {
@@ -141,7 +140,6 @@ router.post('/', async (req, res) => {
             else{
                 const token = jwt.sign({accountNumber: accountNumber}, jwtSecret, {expiresIn:"1h"})
                 res.status(200).json({message: "authentication succ", token: token, name: req.body.name});
-                console.log("new token is", token )
             }
         }
         catch (error)
@@ -153,10 +151,8 @@ router.post('/', async (req, res) => {
 
     router.get("/Home", checkAuth, async (req, res) => {
         try {
-          console.log(req.user);
       
           const accountNumber = req.user.accountNumber; // Get account number from the verified token
-          console.log("Account Number:", accountNumber);
       
           // Fetch user-specific data from the database
           const user = await db.collection('Users').findOne({ accountNumber: accountNumber });
