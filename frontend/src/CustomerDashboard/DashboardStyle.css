@@ -1,100 +1,109 @@
-/* Dashboard container */
-.dashboard-container {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-  }
-  
-  /* Header styling */
-  .dashboard-header {
-    text-align: center;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
-  }
-  
-  /* Layout for body: side menu and main dashboard */
-  .dashboard-body {
-    display: flex;
-    margin-top: 20px;
-  }
-  
-  /* Side menu styling */
-  .side-menu {
-    width: 200px;
-    border-right: 1px solid #ccc;
-  }
-  
-  .side-menu ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .side-menu li {
-    margin: 10px 0;
-    cursor: pointer;
-  }
-  
-  /* Main dashboard area */
-  .dashboard-main {
-    flex: 1;
-    padding-left: 20px;
-  }
-  
-  /* Payment buttons styling */
-  .payment-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-  
-  .local-payment, .intl-payment {
-    padding: 10px 20px;
-    background-color: #007BFF;
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center all items */
+  padding: 10px; /* Reduced padding */
+  border: 2px solid black; /* Black border around the main container */
+  margin: 0 auto; /* Center the container */
+  min-width: 800px; /* Set a wide maximum width for the container */
+  width: 100%;
+  background-color: #f9f9f9; /* Light background color */
+  min-height: 800px;
+  max-height: 800px; /* Reduced maximum height for the container */
+}
+
+.dashboard-title {
+  font-size: 1.8rem; /* Slightly smaller font size for the title */
+  margin-bottom: 8px; /* Reduced space below the title */
+}
+
+.welcome-message {
+  font-size: 1.4rem; /* Slightly smaller welcome message */
+  margin-bottom: 16px; /* Reduced space below the welcome message */
+}
+
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center all items in the main dashboard */
+  width: 100%; /* Full width */
+}
+
+.banking-details {
+  width: 80%; /* Adjust the width as necessary */
+  margin: 20px auto; /* Center the table */
+}
+
+.banking-table {
+  width: 100%; /* Make the table fill the width of the container */
+  border-collapse: collapse; /* Collapse borders for table */
+}
+
+.banking-table td {
+  padding: 10px; /* Padding for table cells */
+  border: 1px solid #ddd; /* Border for table cells */
+  text-align: left; /* Align text to the left */
+}
+
+.banking-table td:nth-child(odd) {
+  background-color: #f9f9f9; /* Light background for odd cells */
+}
+
+.receipts-table {
+  width: 100%; /* Full width */
+  border-collapse: collapse; /* Collapse borders */
+  margin: 20px 0; /* Spacing around the table */
+}
+
+.receipts-table th,
+.receipts-table td {
+  border: 1px solid black; /* Border for table cells */
+  padding: 10px; /* Cell padding */
+  text-align: center; /* Center text */
+}
+
+.pay-again-button {
+  padding: 10px 20px; /* Larger button size */
+  border: 2px solid black; /* Thicker border */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.payment-receipts {
+  margin-top: 20px; /* Space above the payment receipts section */
+}
+
+.payment-buttons {
+  display: flex;
+  justify-content: center; /* Center the buttons */
+  margin-bottom: 16px; /* Reduced space below the buttons */
+}
+
+.payment-buttons button {
+  padding: 12px 25px; /* Slightly smaller buttons */
+  font-size: 1rem; /* Slightly smaller font size */
+  margin: 0 8px; /* Reduced space between buttons */
+  background-color: #54A09B;
+  border: none;
+    color: white;
+  cursor: pointer; /* Pointer on hover */
+}
+
+.form-group {
+  margin-bottom: 12px; /* Reduced space below each form group */
+}
+
+.form-input {
+  padding: 8px; /* Reduced padding inside input fields */
+  font-size: 0.9rem; /* Slightly smaller font size for input fields */
+  border: 1px solid #ccc; /* Light border for input fields */
+  width: 100%; /* Full width input fields */
+}
+
+.pay-again-button {
+  padding: 8px 15px; /* Reduced button padding */
+  margin-top: 8px; /* Reduced space above button */
+  background-color: #54A09B;
     color: white;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .local-payment:hover, .intl-payment:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Banking details styling */
-  .banking-details {
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-  }
-  
-  .banking-details p {
-    margin: 5px 0;
-  }
-  
-  /* Payment receipts styling */
-  .payment-receipts {
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-  }
-  
-  .receipt {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-  }
-  
-  /* Button for "Pay again" */
-  .receipt button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .receipt button:hover {
-    background-color: #218838;
-  }
-  
+  cursor: pointer; /* Pointer on hover */
+}
