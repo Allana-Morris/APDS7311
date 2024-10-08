@@ -1,13 +1,11 @@
 import express from "express";
 import db from "../db/conn.mjs"
 
-
-
+//create router
 const router = express.Router();
 
 
-
-//get all records apparently
+//get all records for testing
 router.get("/", async(req, res)=>{
   let collection = await db.collection("posts");
     let results = await collection.find({}).toArray();

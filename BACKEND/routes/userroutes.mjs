@@ -9,31 +9,9 @@ const router = express.Router();
 var store = new expressBrute.MemoryStore();
 var bruteforce = new expressBrute(store);
 
-const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
+//getting out secret
+const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key'; //i dont think we actually have a fall back, but idk not my code
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  //const token = authHeader && authHeader.split(' ')[1]; // Bearer token
-
-  const token = jwt.sign(
-    { id: user._id, accountNumber: user.accountNumber }, // Include relevant user info in the token
-    jwtSecret, // Use the secret from environment or fallback
-    { expiresIn: "1h" } // Set expiration
-);
-
-  if (!token) {
-      return res.status(401).json({ message: 'No token provided.' });
-  }
-
-  jwt.verify(token, jwtSecret, (err, user) => {
-      if (err) {
-          return res.status(403).json({ message: 'Invalid token.' });
-      }
-
-      req.user = user; // Attach user info to request
-      next();
-  });
-};
 
 // User registration route
 router.post('/', async (req, res) => {
@@ -116,32 +94,40 @@ router.post('/', async (req, res) => {
 });
 
 
-  
+  //Login route
   router.post("/Login", bruteforce.prevent, async (req, res) =>
     {
+        //getting the input
         const {accountNumber, password} = req.body
 
+        //try to login
         try 
         {
+            //getting user from database using the credentials
             const collection = await db.collection("Users")
             const user = await collection.findOne({accountNumber});
 
+            //user isnt real
             if (!user)
             {
                 return res.status(401).json({message: "User with account number not found"});
             }
 
+            //check passwords matching
             const passwordMatch = await bcrypt.compare(password, user.password)
 
+            //they dont match
             if (!passwordMatch)
             {
                 return res.status(401).json({message:"Incorrect password"})
             }
+            //they do match
             else{
                 const token = jwt.sign({accountNumber: accountNumber}, jwtSecret, {expiresIn:"1h"})
                 res.status(200).json({message: "Successful login", token: token, name: req.body.name});
             }
         }
+        //catch an error 
         catch (error)
         {
             console.error("Login error:", error)
@@ -149,27 +135,30 @@ router.post('/', async (req, res) => {
         }
     });
 
-    router.get("/Home", checkAuth, async (req, res) => {
+    //the home route for the dash board
+    router.get("/Home", checkAuth, async (req, res) => { //run check auth along side it
         try {
       
-          const accountNumber = req.user.accountNumber; // Get account number from the verified token
+            //get the account number from the token
+          const accountNumber = req.user.accountNumber;
       
-          // Fetch user-specific data from the database
+          //get user data from the db
           const user = await db.collection('Users').findOne({ accountNumber: accountNumber });
       
+          //if user isnt found, this should hopefully never happen unless someone is playing in the database
           if (!user) {
             return res.status(404).json({ message: "User not found" });
           }
       
-          // Fetch transactions for the user from the Transactions collection
+          //get all the user transactions
           const transactions = await db.collection('Transactions').find({
             $or: [
-              { sender: accountNumber }, // User as sender
-              { 'recipient.accountNumber': accountNumber } // User as recipient
+              { sender: accountNumber }, //for where user is sender
+              { 'recipient.accountNumber': accountNumber } //for where user is recipient
             ]
-          }).toArray();
+          }).toArray(); //put transactions in an array
       
-          // Send user data and transactions as response
+          //send user data and transactions as response
           res.status(200).json({
             message: "Welcome to your dashboard!",
             user: {
@@ -177,56 +166,60 @@ router.post('/', async (req, res) => {
               lastName: user.lastName,
               email: user.email,
               accountNumber: user.accountNumber,
-              balance: user.balance // Assuming balance is stored in the 'balance' field
+              balance: user.balance
             },
-            transactions // Add transactions to the response
+            transactions //also put in the transactions
           });
+          //error for if all goes wrong
         } catch (error) {
           console.error("Error fetching dashboard data:", error);
           res.status(500).json({ message: "Internal server error" });
         }
       });
       
-      router.post("/payment", checkAuth, async (req, res) => {
+      //payment route
+      router.post("/payment", checkAuth, async (req, res) => { //make sure to check auth alng side it
         try {
-            const { type, recBank, recAccNo, amount, swift, branch, currency, recName } = req.body; // Extract payment details from the request body
-            const senderAccountNumber = req.user.accountNumber; // Get the logged-in user's account number from the token
+            //getting payment details from req
+            //also getting account number from sender (the logged user)
+            const { type, recBank, recAccNo, amount, swift, branch, currency, recName } = req.body; 
+            const senderAccountNumber = req.user.accountNumber; 
     
-            // Convert the amount to a number
-            const transferAmount = parseFloat(amount); // Use parseFloat if the amount can be a decimal, or parseInt for integers
+            //convert amount to number specifically a float
+            const transferAmount = parseFloat(amount); 
     
-            // Validate input
+            // Validate general input
             if (!type || !recBank || !recAccNo || !amount || !recName) {
                 return res.status(400).json({ message: "All fields are required." });
             }
     
-            // Check if the payment amount is greater than zero
+            // validate paymnent larger than 0
             if (transferAmount <= 0) {
                 return res.status(400).json({ message: "Payment amount must be greater than zero." });
             }
     
-            // Validate recipient name: only letters allowed
+            //validate recipient name, only letters allowed
             const nameRegex = /^[A-Za-z\s]+$/;
             if (!nameRegex.test(recName)) {
                 return res.status(400).json({ message: "Recipient name must contain only letters." });
             }
     
-            // Validate bank name: cannot contain numbers
+            //validate bank name, cannot contain numbers
             const bankNameRegex = /^[A-Za-z\s]+$/;
             if (!bankNameRegex.test(recBank)) {
                 return res.status(400).json({ message: "Bank name must contain only letters." });
             }
     
-            // Validate recipient account number: only digits, 6 to 11 characters
-            const accNoRegex = /^\d{6,11}$/; // Regex for 6 to 11 digits
+            //validate recipient account number, only digits, 6 to 11 characters
+            const accNoRegex = /^\d{6,11}$/;
             if (!accNoRegex.test(recAccNo)) {
                 return res.status(400).json({ message: "Account number must be between 6 and 11 digits and can only contain numbers." });
             }
     
-            // Validate SWIFT code and currency only for non-local payments
+            //  validate SWIFT code and currency only for non-local payments only
             if (type !== "local") {
-                // Validate SWIFT code: typically 8 or 11 characters, alphanumeric
-                const swiftRegex = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/; // Example: AAAABBCCDDD or AAAABBCC
+                //validate SWIFT code for 8 or 11 characters, first 6 must be letters
+                const swiftRegex = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/; //example: AAAABBCCDDD or AAAABBCC
                 if (!swiftRegex.test(swift)) {
                     return res.status(400).json({ message: "SWIFT code must be 8 or 11 characters long and can only contain letters and numbers." });
                 }
@@ -236,40 +229,41 @@ router.post('/', async (req, res) => {
                     return res.status(400).json({ message: "Currency is required for international payments." });
                 }
             } else {
-                // Validate branch code only for local payments
+                //validate branch code only for local payments
                 if (!branch) {
                     return res.status(400).json({ message: "Branch code is required for local payments." });
                 }
     
-                // Validate branch code: customize based on your requirements
+                //validate branch code, made it 3 or 5 letters, caps sensitive
                 const branchRegex = /^[0-9A-Z]{3,5}$/; // Example: 123 or ABCD
                 if (!branchRegex.test(branch)) {
                     return res.status(400).json({ message: "Branch code must be 3 to 5 alphanumeric characters." });
                 }
             }
     
-            // Fetch the sender (user) from the database
+            //fetch the user from the database
             const sender = await db.collection('Users').findOne({ accountNumber: senderAccountNumber });
     
+            //validate if the user is real, (they should be)
             if (!sender) {
                 return res.status(404).json({ message: "Sender not found." });
             }
     
-            // Check if the sender has enough balance
-            const userBalance = sender.balance; // Assuming the user's balance is stored in the 'balance' field
+            //check if the sender has enough balance
+            const userBalance = sender.balance;
             if (userBalance < transferAmount) {
                 return res.status(400).json({ message: "Insufficient funds." });
             }
     
-            // Fetch the recipient by account number (if exists)
+            //get the recipient by account number
             const recipient = await db.collection('Users').findOne({ accountNumber: recAccNo });
     
-            // Create a transaction object
+            //creating the transaction object
             const transaction = {
-                transactionId: `txn_${Date.now()}`, // Create a unique transaction ID
+                transactionId: `txn_${Date.now()}`, //just an id for genera purpose
                 type,
-                sender: senderAccountNumber, // Store the sender's account number
-                recipient: {
+                sender: senderAccountNumber, //the user/senders account number
+                recipient: { //the whole recipient object/info
                     name: recName,
                     bank: recBank,
                     accountNumber: recAccNo,
@@ -281,25 +275,27 @@ router.post('/', async (req, res) => {
                 date: new Date(),
             };
     
-            // Deduct the amount from the sender's balance
+            //deduct the amount from the sender/user balance
             const newSenderBalance = userBalance - transferAmount;
     
-            // Update the sender's balance in the database
+            //update the sender balance
             await db.collection('Users').updateOne(
                 { accountNumber: senderAccountNumber },
                 { $set: { balance: newSenderBalance } }
             );
     
-            // If recipient exists, add the amount to their balance
+            //check if the recipient is in the databse, if they are we can add money to them
             if (recipient) {
+                //making the new balance
                 const newRecipientBalance = recipient.balance + transferAmount;
     
-                // Update the recipient's balance in the database
+                //update recipient balance
                 await db.collection('Users').updateOne(
                     { accountNumber: recAccNo },
                     { $set: { balance: newRecipientBalance } }
                 );
     
+                //show its success
                 res.status(201).json({
                     message: "Transaction processed successfully!",
                     transaction,
@@ -307,7 +303,7 @@ router.post('/', async (req, res) => {
                     recipientNewBalance: newRecipientBalance
                 });
             } else {
-                // If no recipient, just send the response without updating recipient
+                // If no recipient then its still all cool, just money leaving the economy
                 res.status(201).json({
                     message: "Transaction processed successfully, but no recipient found with the provided account number.",
                     transaction,
@@ -315,20 +311,14 @@ router.post('/', async (req, res) => {
                 });
             }
     
-            // Save the transaction in the Transactions collection
+            //store the transaction in the database
             await db.collection('Transactions').insertOne(transaction);
             
         } catch (error) {
+            //general error for if all goes wrong
             console.error("Error processing payment:", error);
             res.status(500).json({ message: "Internal server error." });
         }
     });
-    
-    
-    
-
-
-
-
 
 export default router;

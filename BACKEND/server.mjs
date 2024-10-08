@@ -1,5 +1,4 @@
 import express from "express";
-//import db from "../BACKEND/db/conn.mjs";
 import https from "https";
 import fs from "fs";
 import posts from "./routes/post.mjs"
@@ -7,43 +6,49 @@ import userstuff from "./routes/userroutes.mjs"
 import helmet from "helmet";
 import cors from "cors"
 
+//seting port and express
 const PORT = 3001;
 const app = express();
 
+//setting ssl
 const options = {
     key: fs.readFileSync('keys/privatekey.pem'),
     cert: fs.readFileSync('keys/certificate.pem')
 }
 
+//applying helmet
 app.use(helmet());
 app.use((req, res, next) => {
-    // Sets Content Security Policy
+    //set security policy
     res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none';");
   
-    // Sets X-Content-Type-Options
+    //set content x options
     res.setHeader('X-Content-Type-Options', 'nosniff'); // Prevents MIME type sniffing
   
-    // Sets X-Frame-Options
+    //sets x fram options
     res.setHeader('X-Frame-Options', 'DENY'); // Prevents clickjacking by disallowing iframes
   
-    // Sets X-XSS-Protection
+    //sets xxxss protection
     res.setHeader('X-XSS-Protection', '1; mode=block'); // Enables XSS filtering
   
-    // Sets Referrer-Policy
+    //sets referer policy
     res.setHeader('Referrer-Policy', 'no-referrer'); // Prevents the browser from sending the referrer header
   
-    // Sets Strict-Transport-Security
+    // sets strict transport security
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains'); // Enforces HTTPS
   
-    // Sets Permissions-Policy
+    // sets permissions policy
     res.setHeader('Permissions-Policy', "geolocation=(self), microphone=(), camera=()"); // Limits feature access
   
-    // Calls the next middleware
+    //start the next middleware
     next();
   });
+
+  //setting cors aand express
 app.use(cors())
 app.use(express.json());
 
+//cors settings
 app.use((reg, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
@@ -51,14 +56,16 @@ app.use((reg, res, next) => {
     next();
 })
 
+//setting our routes
 app.use("/post", posts);
 app.route("/post", posts)
 
 app.use("/users", userstuff);
 
+//creating the server with all app options
 let server = https.createServer(options, app)
 
-// Server listening
+//set the server to listen on our port
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
