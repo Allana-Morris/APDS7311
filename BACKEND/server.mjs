@@ -4,7 +4,7 @@ import https from "https";
 import fs from "fs";
 import posts from "./routes/post.mjs"
 import userstuff from "./routes/userroutes.mjs"
-import users from "./models/User.mjs"; 
+import helmet from "helmet";
 import cors from "cors"
 
 const PORT = 3001;
@@ -15,13 +15,14 @@ const options = {
     cert: fs.readFileSync('keys/certificate.pem')
 }
 
+app.use(helmet());
 app.use(cors())
 app.use(express.json());
 
-app.use((reg, res, next)=>{
-    res.setHeader('Access-Control-Allow-Origin','*');
-    res.setHeader('Access-Control-Allow-Headers','*');
-    res.setHeader('Access-Control-Allow-Methods','*');
+app.use((reg, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*');
     next();
 })
 
@@ -29,8 +30,6 @@ app.use("/post", posts);
 app.route("/post", posts)
 
 app.use("/users", userstuff);
-
-//app.use("/user", users);
 
 let server = https.createServer(options, app)
 

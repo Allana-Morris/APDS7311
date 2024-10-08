@@ -31,9 +31,9 @@ function Dashboard() {
     // Sort transactions by date and get the three most recent
     const sortedTransactions = transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
     const recent = sortedTransactions.slice(0, 3).map(transaction => ({
-      date: new Date(transaction.date).toLocaleDateString(), // Format the date to only show the date
-      recipientName: transaction.recipient.name,
-      transactionId: transaction.transactionId,
+      date: new Date(transactions.date).toLocaleDateString(), // Format the date to only show the date
+      recipientName: transactions.recipient.name,
+      transactionId: transactions.transactionId,
     }));
     setRecentTransactions(recent); // Set the recent transactions
   };
