@@ -128,18 +128,18 @@ router.post('/', async (req, res) => {
 
             if (!user)
             {
-                return res.status(401).json({message: "No Account Found"});
+                return res.status(401).json({message: "User with account number not found"});
             }
 
             const passwordMatch = await bcrypt.compare(password, user.password)
 
             if (!passwordMatch)
             {
-                return res.status(401).json({message:"Password is Incorrect"})
+                return res.status(401).json({message:"Incorrect password"})
             }
             else{
                 const token = jwt.sign({accountNumber: accountNumber}, jwtSecret, {expiresIn:"1h"})
-                res.status(200).json({message: "Login Successful", token: token, name: req.body.name});
+                res.status(200).json({message: "Successful login", token: token, name: req.body.name});
             }
         }
         catch (error)
