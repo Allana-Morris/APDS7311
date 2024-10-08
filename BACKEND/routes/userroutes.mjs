@@ -197,102 +197,145 @@ router.post('/', async (req, res) => {
         }
       });
       
-
-  router.post("/payment", checkAuth, async (req, res) => {
-    try {
-        const { type, recBank, recAccNo, amount, swift, branch, currency, recName } = req.body; // Extract payment details from the request body
-        const senderAccountNumber = req.user.accountNumber; // Get the logged-in user's account number from the token
-
-        // Convert the amount to a number
-        const transferAmount = parseFloat(amount); // Use parseFloat if the amount can be a decimal, or parseInt for integers
-
-        // Validate input
-        if (type === "local") {
-            if (!type || !recBank || !recAccNo || !amount || !branch || !recName) {
-                return res.status(400).json({ message: "All fields are required for local payment." });
+      router.post("/payment", checkAuth, async (req, res) => {
+        try {
+            const { type, recBank, recAccNo, amount, swift, branch, currency, recName } = req.body; // Extract payment details from the request body
+            const senderAccountNumber = req.user.accountNumber; // Get the logged-in user's account number from the token
+    
+            // Convert the amount to a number
+            const transferAmount = parseFloat(amount); // Use parseFloat if the amount can be a decimal, or parseInt for integers
+    
+            // Validate input
+            if (!type || !recBank || !recAccNo || !amount || !recName) {
+                return res.status(400).json({ message: "All fields are required." });
             }
-        } else {
-            if (!type || !recBank || !recAccNo || !amount || !swift || !currency || !recName) {
-                return res.status(400).json({ message: "All fields are required for international payment." });
+    
+            // Check if the payment amount is greater than zero
+            if (transferAmount <= 0) {
+                return res.status(400).json({ message: "Payment amount must be greater than zero." });
             }
-        }
-
-        // Fetch the sender (user) from the database
-        const sender = await db.collection('Users').findOne({ accountNumber: senderAccountNumber });
-
-        if (!sender) {
-            return res.status(404).json({ message: "Sender not found." });
-        }
-
-        // Check if the sender has enough balance
-        const userBalance = sender.balance; // Assuming the user's balance is stored in the 'balance' field
-        if (userBalance < transferAmount) {
-            return res.status(400).json({ message: "Insufficient funds." });
-        }
-
-        // Fetch the recipient by account number (if exists)
-        const recipient = await db.collection('Users').findOne({ accountNumber: recAccNo });
-
-        // Create a transaction object
-        const transaction = {
-            transactionId: `txn_${Date.now()}`, // Create a unique transaction ID
-            type,
-            sender: senderAccountNumber, // Store the sender's account number
-            recipient: {
-                name: recName,
-                bank: recBank,
-                accountNumber: recAccNo,
-            },
-            amount: transferAmount,
-            swift,
-            branch,
-            currency,
-            date: new Date(),
-        };
-
-        // Deduct the amount from the sender's balance
-        const newSenderBalance = userBalance - transferAmount;
-
-        // Update the sender's balance in the database
-        await db.collection('Users').updateOne(
-            { accountNumber: senderAccountNumber },
-            { $set: { balance: newSenderBalance } }
-        );
-
-        // If recipient exists, add the amount to their balance
-        if (recipient) {
-            const newRecipientBalance = recipient.balance + transferAmount;
-
-            // Update the recipient's balance in the database
+    
+            // Validate recipient name: only letters allowed
+            const nameRegex = /^[A-Za-z\s]+$/;
+            if (!nameRegex.test(recName)) {
+                return res.status(400).json({ message: "Recipient name must contain only letters." });
+            }
+    
+            // Validate bank name: cannot contain numbers
+            const bankNameRegex = /^[A-Za-z\s]+$/;
+            if (!bankNameRegex.test(recBank)) {
+                return res.status(400).json({ message: "Bank name must contain only letters." });
+            }
+    
+            // Validate recipient account number: only digits, 6 to 11 characters
+            const accNoRegex = /^\d{6,11}$/; // Regex for 6 to 11 digits
+            if (!accNoRegex.test(recAccNo)) {
+                return res.status(400).json({ message: "Account number must be between 6 and 11 digits and can only contain numbers." });
+            }
+    
+            // Validate SWIFT code and currency only for non-local payments
+            if (type !== "local") {
+                // Validate SWIFT code: typically 8 or 11 characters, alphanumeric
+                const swiftRegex = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/; // Example: AAAABBCCDDD or AAAABBCC
+                if (!swiftRegex.test(swift)) {
+                    return res.status(400).json({ message: "SWIFT code must be 8 or 11 characters long and can only contain letters and numbers." });
+                }
+    
+                // Validate currency
+                if (!currency) {
+                    return res.status(400).json({ message: "Currency is required for international payments." });
+                }
+            } else {
+                // Validate branch code only for local payments
+                if (!branch) {
+                    return res.status(400).json({ message: "Branch code is required for local payments." });
+                }
+    
+                // Validate branch code: customize based on your requirements
+                const branchRegex = /^[0-9A-Z]{3,5}$/; // Example: 123 or ABCD
+                if (!branchRegex.test(branch)) {
+                    return res.status(400).json({ message: "Branch code must be 3 to 5 alphanumeric characters." });
+                }
+            }
+    
+            // Fetch the sender (user) from the database
+            const sender = await db.collection('Users').findOne({ accountNumber: senderAccountNumber });
+    
+            if (!sender) {
+                return res.status(404).json({ message: "Sender not found." });
+            }
+    
+            // Check if the sender has enough balance
+            const userBalance = sender.balance; // Assuming the user's balance is stored in the 'balance' field
+            if (userBalance < transferAmount) {
+                return res.status(400).json({ message: "Insufficient funds." });
+            }
+    
+            // Fetch the recipient by account number (if exists)
+            const recipient = await db.collection('Users').findOne({ accountNumber: recAccNo });
+    
+            // Create a transaction object
+            const transaction = {
+                transactionId: `txn_${Date.now()}`, // Create a unique transaction ID
+                type,
+                sender: senderAccountNumber, // Store the sender's account number
+                recipient: {
+                    name: recName,
+                    bank: recBank,
+                    accountNumber: recAccNo,
+                },
+                amount: transferAmount,
+                swift,
+                branch,
+                currency,
+                date: new Date(),
+            };
+    
+            // Deduct the amount from the sender's balance
+            const newSenderBalance = userBalance - transferAmount;
+    
+            // Update the sender's balance in the database
             await db.collection('Users').updateOne(
-                { accountNumber: recAccNo },
-                { $set: { balance: newRecipientBalance } }
+                { accountNumber: senderAccountNumber },
+                { $set: { balance: newSenderBalance } }
             );
-
-            res.status(201).json({
-                message: "Transaction processed successfully!",
-                transaction,
-                senderNewBalance: newSenderBalance,
-                recipientNewBalance: newRecipientBalance
-            });
-        } else {
-            // If no recipient, just send the response without updating recipient
-            res.status(201).json({
-                message: "Transaction processed successfully, but no recipient found with the provided account number.",
-                transaction,
-                senderNewBalance: newSenderBalance
-            });
+    
+            // If recipient exists, add the amount to their balance
+            if (recipient) {
+                const newRecipientBalance = recipient.balance + transferAmount;
+    
+                // Update the recipient's balance in the database
+                await db.collection('Users').updateOne(
+                    { accountNumber: recAccNo },
+                    { $set: { balance: newRecipientBalance } }
+                );
+    
+                res.status(201).json({
+                    message: "Transaction processed successfully!",
+                    transaction,
+                    senderNewBalance: newSenderBalance,
+                    recipientNewBalance: newRecipientBalance
+                });
+            } else {
+                // If no recipient, just send the response without updating recipient
+                res.status(201).json({
+                    message: "Transaction processed successfully, but no recipient found with the provided account number.",
+                    transaction,
+                    senderNewBalance: newSenderBalance
+                });
+            }
+    
+            // Save the transaction in the Transactions collection
+            await db.collection('Transactions').insertOne(transaction);
+            
+        } catch (error) {
+            console.error("Error processing payment:", error);
+            res.status(500).json({ message: "Internal server error." });
         }
-
-        // Save the transaction in the Transactions collection
-        await db.collection('Transactions').insertOne(transaction);
-        
-    } catch (error) {
-        console.error("Error processing payment:", error);
-        res.status(500).json({ message: "Internal server error." });
-    }
-});
-
+    });
+    
+    
+    
 
 
 
