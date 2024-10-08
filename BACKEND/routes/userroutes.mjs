@@ -158,36 +158,45 @@ router.post('/', async (req, res) => {
     });
 
     router.get("/Home", checkAuth, async (req, res) => {
-      try {
-        console.log(req.user)
-          
-        const accountNumber = req.user.accountNumber; // Get account number from the verified token
-        console.log("Account Number:", accountNumber);
-  
+        try {
+          console.log(req.user);
+      
+          const accountNumber = req.user.accountNumber; // Get account number from the verified token
+          console.log("Account Number:", accountNumber);
+      
           // Fetch user-specific data from the database
           const user = await db.collection('Users').findOne({ accountNumber: accountNumber });
-  
+      
           if (!user) {
-              return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
           }
-  
-          // Send user data as response
+      
+          // Fetch transactions for the user from the Transactions collection
+          const transactions = await db.collection('Transactions').find({
+            $or: [
+              { sender: accountNumber }, // User as sender
+              { 'recipient.accountNumber': accountNumber } // User as recipient
+            ]
+          }).toArray();
+      
+          // Send user data and transactions as response
           res.status(200).json({
-              message: "Welcome to your dashboard!",
-              user: {
-                  firstName: user.firstName,
-                  lastName: user.lastName,
-                  email: user.email,
-                  accountNumber: user.accountNumber,
-                  balance: user.balance // Assuming balance is stored in the 'balance' field
-
-              }
+            message: "Welcome to your dashboard!",
+            user: {
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              accountNumber: user.accountNumber,
+              balance: user.balance // Assuming balance is stored in the 'balance' field
+            },
+            transactions // Add transactions to the response
           });
-      } catch (error) {
+        } catch (error) {
           console.error("Error fetching dashboard data:", error);
           res.status(500).json({ message: "Internal server error" });
-      }
-  });
+        }
+      });
+      
 
   router.post("/payment", checkAuth, async (req, res) => {
     try {

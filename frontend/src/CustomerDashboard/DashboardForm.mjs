@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const [user, setUser] = useState(null);
-  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [transactions, setTransactions] = useState([]); // State to store transactions
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,25 +19,12 @@ function Dashboard() {
       .then(response => response.json())
       .then(data => {
         setUser(data.user);
-        if (data.transactions) {
-          fetchRecentTransactions(data.transactions); // Fetch recent transactions only if they exist
-        }
+        setTransactions(data.transactions || []); // Set transactions from response
       })
       .catch(err => console.error('Error fetching user data:', err));
     }
   }, []);
 
-  const fetchRecentTransactions = (transactions) => {
-    // Sort transactions by date and get the three most recent
-    const sortedTransactions = transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-    const recent = sortedTransactions.slice(0, 3).map(transaction => ({
-      date: new Date(transaction.date).toLocaleDateString(), // Format the date to only show the date
-      recipientName: transaction.recipient.name,
-      transactionId: transaction.transactionId,
-    }));
-    setRecentTransactions(recent); // Set the recent transactions
-  };
- 
   if (!user) {
     return <p>Loading...</p>;
   }
@@ -52,82 +39,97 @@ function Dashboard() {
 
   return (
     <div className="container">
-        <h1 className="dashboard-title">Customer Dashboard</h1>
-        <h2 className="welcome-message">Hello, {user.firstName} {user.lastName}</h2>
-        <br></br>
-        <div className="dashboard-main">
-          <div className="payment-buttons">
-            <button className="local-payment" onClick={handleLocalPaymentClick}>
-              Make Local Payment
-            </button>
-            <button className="intl-payment" onClick={handleInternationalPaymentClick}>
-              Make International Payment
-            </button>
-          </div>
-          
-          <div className="banking-details">
-  <h3 style={{ textAlign: 'center' }}>Banking Details</h3>
-  <table className="banking-table">
-          <tbody>
-          <tr>
-              <br></br>
-            </tr>
-            <tr>
-              <td width={"10%"}></td>
-            <td style={{fontWeight: 'bolder'}}>Current Acc</td>
-            <td></td>
-            <td></td>
-            </tr>
-            <tr>
-            <td width={"10%"}></td>
-              <td style={{fontWeight: 'bold'}}>Acc No:</td>
-              <td></td>
-              <td style={{fontWeight: 'bold'}}>Available Bal:</td>
-            </tr>
-            <tr>
-            <td width={"10%"}></td>
-            <td>{user.accountNumber}</td>
-            <td></td>
-            <td>{`R${user.balance ? user.balance.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',') : '0,00'}`}</td>
-            </tr>
-            <tr>
-              <br></br>
-            </tr>
-          </tbody>
-        </table>
-</div>
+      <h1 className="dashboard-title">Customer Dashboard</h1>
+      <h2 className="welcome-message">Hello, {user.firstName} {user.lastName}</h2>
+      <br />
+      <div className="dashboard-main">
+        <div className="payment-buttons">
+          <button className="local-payment" onClick={handleLocalPaymentClick}>
+            Make Local Payment
+          </button>
+          <button className="intl-payment" onClick={handleInternationalPaymentClick}>
+            Make International Payment
+          </button>
+        </div>
 
-<div className="payment-receipts" style={{ textAlign: 'center' }}>
-        <h3>Payment Receipts</h3>
-        <table className="receipts-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Recipient's Name</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentTransactions.length > 0 ? (
-              recentTransactions.map((transaction, index) => (
-                <tr key={index}>
-                  <td>{transaction.date}</td>
-                  <td>{transaction.recipientName}</td>
-                  <td>
-                    <button className="pay-again-button">Pay again</button>
-                  </td>
-                </tr>
-              ))
-            ) : (
+        <div className="banking-details">
+          <h3 style={{ textAlign: 'center' }}>Banking Details</h3>
+          <table className="banking-table">
+            <tbody>
               <tr>
-                <td colSpan="3" style={{ textAlign: 'center' }}>No transactions found.</td>
+                <br />
               </tr>
-            )}
-          </tbody>
-        </table>
+              <tr>
+                <td width={"10%"}></td>
+                <td style={{ fontWeight: 'bolder' }}>Current Acc</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td width={"10%"}></td>
+                <td style={{ fontWeight: 'bold' }}>Acc No:</td>
+                <td></td>
+                <td style={{ fontWeight: 'bold' }}>Available Bal:</td>
+              </tr>
+              <tr>
+                <td width={"10%"}></td>
+                <td>{user.accountNumber}</td>
+                <td></td>
+                <td>{`R${user.balance ? user.balance.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',') : '0,00'}`}</td>
+              </tr>
+              <tr>
+                <br />
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="payment-receipts" style={{ textAlign: 'center', overflowY: 'auto', maxHeight: '300px' }}> {/* Add scrolling */}
+          <h3>Payment Receipts</h3>
+          <table className="receipts-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Payer</th>
+                <th>Recipient</th>
+                <th>Amount</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.length > 0 ? (
+                transactions.map((transaction, index) => {
+                  const isPayer = transaction.sender === user.accountNumber;
+                  const amount = parseFloat(transaction.amount);
+                  const displayAmount = isPayer ? `- R${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',')}` 
+                                                  : `+ R${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',')}`;
+                  
+                  const amountStyle = isPayer ? { color: 'red' } : { color: 'green' }; // Conditional styling for amount
+
+                  return (
+                    <tr key={index}>
+                      <td>{new Date(transaction.date).toLocaleDateString()}</td> {/* Format date */}
+                      <td>{isPayer ? user.firstName + ' ' + user.lastName : transaction.sender}</td> {/* Show payer's name */}
+                      <td>{transaction.recipient.name}</td> {/* Access recipient's name */}
+                      <td style={amountStyle}>{displayAmount}</td> {/* Apply conditional styles */}
+                      <td>
+                        {isPayer && (
+                          <button className="pay-again-button">Pay again</button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center' }}>No transactions found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-      </div>
-      </div>
+    </div>
   );
 };
 
