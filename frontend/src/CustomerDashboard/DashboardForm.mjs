@@ -102,15 +102,15 @@ function Dashboard() {
           </table>
         </div>
 
+<h3>Payment Receipts</h3>
         <div className="payment-receipts" style={{ textAlign: 'center', overflowY: 'auto', maxHeight: '300px' }}> {/* Add scrolling */}
-          <h3>Payment Receipts</h3>
           <table className="receipts-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Payer</th>
-                <th>Recipient</th>
-                <th>Amount</th>
+                <th style={{width: '20%'}} >Date</th>
+                <th style={{width: '20%'}} >Payer</th>
+                <th style={{width: '20%'}} >Recipient</th>
+                <th style={{width: '20%'}} >Amount</th>
                 <th></th>
               </tr>
             </thead>
@@ -146,6 +146,7 @@ function Dashboard() {
             </tbody>
           </table>
         </div>
+        <br></br>
       </div>
     </div>
   );

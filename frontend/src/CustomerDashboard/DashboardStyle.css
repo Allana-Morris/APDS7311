@@ -52,7 +52,7 @@
 }
 
 .payment-receipts {
-  margin: 20px auto; /* Space above the payment receipts section */
+  margin: 5px auto; /* Space above the payment receipts section */
   width: 80%;
   cursor: default;
 }

@@ -21,7 +21,6 @@ const authenticateToken = (req, res, next) => {
     { expiresIn: "1h" } // Set expiration
 );
 
-
   if (!token) {
       return res.status(401).json({ message: 'No token provided.' });
   }
@@ -36,11 +35,6 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-
-/*router.get("/", async(req, res)=>{
-  
-  });
-*/
 // User registration route
 router.post('/', async (req, res) => {
     const { firstName, lastName, email, password, confirmPassword, accountNumber, idNumber } = req.body;
@@ -293,42 +287,4 @@ router.post('/', async (req, res) => {
     }
 });
 
-
-
-
-
-
 export default router;
-
-// Login route
-/*router.post("/login", bruteforce.prevent, async (req, res) => {
-    const { accountNumber, password } = req.body;
-  
-    try {
-      // Find the user by account number
-
-      const user = await User.findOne({ accountNumber });
-
-  
-      if (!user) {
-        return res.status(400).json("Invalid account number or password");
-      }
-  
-    // Compare the provided password with the stored hashed password using the User model's method
-    const isMatch = await user.comparePassword(password);
-  
-      if (!isMatch) {
-        return res.status(400).json("Invalid account number or password");
-      }
-  
-      // Generate a JWT token
-      const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: "1h" });
-  
-      // Return the JWT token
-      res.json({ token });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json("Server error");
-    }
-  });
-  */
