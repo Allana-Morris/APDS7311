@@ -47,7 +47,7 @@ function DetailsForm() {
       const token = localStorage.getItem('jwt');
 
       // Make the POST request to the backend
-      const response = await fetch('https://localhost:3001/users/payment', {
+      const response = await fetch('https://localhost:3001/users/Payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ function DetailsForm() {
       accountNumber: '',
       amount: '',
       swiftCode: '',
-      currency: 'USD' // Reset currency to default
+      currency: 'ZAR' // Reset currency to default
     });
   };
 

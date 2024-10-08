@@ -8,7 +8,7 @@ function LocalPaymentForm() {
     recipientBank: '',
     accountNumber: '',
     amount: '',
-    branch: '' // Change swiftCode to branch
+    branch: '' // Changed swiftCode to branch
   });
 
   // Get user input
@@ -43,7 +43,7 @@ function LocalPaymentForm() {
 
     try {
       // Send a POST request to the backend
-      const response = await fetch('https://localhost:3001/users/payment', {
+      const response = await fetch('https://localhost:3001/users/Payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,13 +72,13 @@ function LocalPaymentForm() {
       recipientBank: '',
       accountNumber: '',
       amount: '',
-      branch: '' // Change swiftCode to branch
+      branch: '' // Changed swiftCode to branch
     });
   };
 
   return (
     <div className="form-container">
-      <h2 className="form-title">Local Payment Form</h2> {/* Title remains the same */}
+      <h2 className="form-title">Local Payment Form</h2> 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="recipientName">Recipient's Name:</label>
@@ -129,11 +129,11 @@ function LocalPaymentForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="branch">Enter Branch:</label> {/* Updated label */}
+          <label htmlFor="branch">Enter Branch:</label> 
           <input
             type="text"
             id="branch"
-            name="branch" // Change swiftCode to branch
+            name="branch" // Changed swiftCode to branch
             value={formData.branch}
             onChange={handleChange}
             placeholder="Enter Bank Branch"

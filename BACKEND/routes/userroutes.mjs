@@ -37,51 +37,58 @@ const authenticateToken = (req, res, next) => {
 };
 
 
-router.get("/", async(req, res)=>{
-  res.status(200).send("Peanits");
+/*router.get("/", async(req, res)=>{
+  
   });
-
+*/
 // User registration route
-router.post('/register', async (req, res) => {
+router.post('/', async (req, res) => {
     const { firstName, lastName, email, password, confirmPassword, accountNumber, idNumber } = req.body;
-    console.log("Your Mom")
-    console.log({firstName, lastName, email, password, confirmPassword, accountNumber, idNumber})
-    // Input validation
-    const namePattern = /^[a-zA-Z\s]+$/; // Allows only letters and spaces
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co\.za)$/ // Valid email format
-    const accountNumberPattern = /^\d{6,11}$/; //South African bank account number validation (6 to 11 digits)
+
+    // Regular Expressions for Validation
+    const namePattern = /^[a-zA-Z\s-]+$/; // Allows letters, spaces, and hyphens
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co\.za)$/; // Valid email format
+    const accountNumberPattern = /^\d{6,11}$/; // South African bank account number validation (6 to 11 digits)
     const southAfricanIDPattern = /^(?!000000)(\d{2})(\d{2})(\d{2})(\d{4})([01])(\d)(\d)$/; // SA ID validation
-
-    if (!namePattern.test(firstName) || !namePattern.test(lastName)) {
-        return res.status(400).json({ message: 'Invalid name.' });
-    }
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/; // Password validation
     
-    if (!emailPattern.test(email)) {
-        return res.status(400).json({ message: 'Invalid email.' });
-    }
-
-    if (!accountNumberPattern.test(accountNumber)) {
-        return res.status(400).json({ message: 'Invalid bank account number.' });
-    }
-
-    if (!southAfricanIDPattern.test(idNumber)) {
-       // console.log({idNumber})
-        return res.status(400).json({ message: 'Invalid South African ID number.'});
-        // return res.status(400).json({ message: 'Invalid South African ID.' });
-    }
-
-    // Password validation
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/; // At least 12 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
-
-    if (!passwordPattern.test(password)) {
-       return res.status(400).json({ message: 'Password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.' });
-    }
-
-    if (password !== confirmPassword) {
-        return res.status(400).json({ message: 'Passwords do not match.' });
-    }
+    // Input validation function
+    const validateInput = (firstName, lastName, email, accountNumber, idNumber, password, confirmPassword) => {
+        if (!namePattern.test(firstName) || !namePattern.test(lastName)) {
+            return { valid: false, message: 'Invalid name. Only letters, spaces, and hyphens are allowed.' };
+        }
+    
+        if (!emailPattern.test(email)) {
+            return { valid: false, message: 'Invalid email format. Please use a valid email.' };
+        }
+    
+        if (!accountNumberPattern.test(accountNumber)) {
+            return { valid: false, message: 'Invalid bank account number. It should be between 6 and 11 digits.' };
+        }
+    
+        if (!southAfricanIDPattern.test(idNumber)) {
+            return { valid: false, message: 'Invalid South African ID number.' };
+        }
+    
+        if (!passwordPattern.test(password)) {
+            return { valid: false, message: 'Password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.' };
+        }
+    
+        if (password !== confirmPassword) {
+            return { valid: false, message: 'Passwords do not match.' };
+        }
+    
+        return { valid: true }; // All validations passed
+    };
 
     try {
+    // Usage of validateInput
+    const validationResult = validateInput(firstName, lastName, email, accountNumber, idNumber, password, confirmPassword);
+    if (!validationResult.valid) {
+        return res.status(400).json({ message: validationResult.message });
+    }
+
+    
         // Check if user already exists
         const existingUser = await db.collection('Users').findOne({ email });
         if (existingUser) {
@@ -92,7 +99,7 @@ router.post('/register', async (req, res) => {
         const saltRounds = 10; // Number of salt rounds
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        const balance = 0;
+        const balance = 10000;
 
         // Create a new user
         const newUser = {
@@ -116,7 +123,7 @@ router.post('/register', async (req, res) => {
 
 
   
-  router.post("/login", bruteforce.prevent, async (req, res) =>
+  router.post("/Login", bruteforce.prevent, async (req, res) =>
     {
         const {accountNumber, password} = req.body
         console.log(accountNumber + " " + password)
@@ -150,7 +157,7 @@ router.post('/register', async (req, res) => {
         }
     });
 
-    router.get("/dash", checkAuth, async (req, res) => {
+    router.get("/Home", checkAuth, async (req, res) => {
       try {
         console.log(req.user)
           

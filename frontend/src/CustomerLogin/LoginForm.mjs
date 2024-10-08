@@ -28,7 +28,7 @@ function LoginForm() {
         alert('Login successful!');
         
         // Navigate to the dashboard page after successful login
-        navigate('/dash');
+        navigate('/Home');
       } else {
         // Display an error message if login failed
         alert('Login failed: ' + data.message);
