@@ -13,6 +13,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true  # Enforce Node.js 20
+
     steps:
       # Checkout the code from the repository
       - name: Checkout repository
@@ -22,7 +25,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Use the latest Node.js version
+          node-version: '20'  # Ensure Node.js 20 is used
 
       # Clear Node.js cache
       - name: Clear Node.js cache
@@ -38,6 +41,9 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true  # Enforce Node.js 20
 
     steps:
       # Checkout the code from the repository
@@ -64,6 +70,9 @@ jobs:
 
   security_scan:
     runs-on: ubuntu-latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true  # Enforce Node.js 20
 
     steps:
       # Checkout the code from the repository
