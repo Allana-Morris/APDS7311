@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Link } from 'react-router-dom';
+import {Helmet} from 'react-helmet';
 import './RegisterStyles.css'; // Import the CSS file
 
 const RegistrationForm = () => {
@@ -81,6 +82,13 @@ const RegistrationForm = () => {
 
           if (response.ok) {
               alert('Registration successful!');
+              setFirstName('');
+              setLastName('');
+              setEmail('');
+              setPassword('');
+              setConfirmPassword('');
+              setAccountNumber('');
+              setIdNumber('');
               navigate('/Login'); // Uses navigate to redirect
           } else {
               const errorMessage = data.message || 'Registration failed. Please try again.'; 
@@ -93,8 +101,13 @@ const RegistrationForm = () => {
   };
 
   return (
+    <div>
+      <Helmet>
+        <title>Register - Mars Portal</title>
+        <meta name="description" content="Create a new account for Mars Portal." />
+      </Helmet>
     <form className="registration-form" onSubmit={handleSubmit}>
-      <h2 className='customer-heading'>Customer Registration Form</h2>
+      <h2 className='customer-heading'>Customer Registration</h2>
       {error && <div className="error-message">{error}</div>} {/* Display error messages */}
       <div className="form-fields">
       <br></br>
@@ -183,7 +196,7 @@ const RegistrationForm = () => {
   </Link>
 </div>
     </form>
-    
+    </div>
   );
 }
 
