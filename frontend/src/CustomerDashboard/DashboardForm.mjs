@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const [user, setUser] = useState(null);
+  const [recentTransactions, setRecentTransactions] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,10 +19,24 @@ function Dashboard() {
       .then(response => response.json())
       .then(data => {
         setUser(data.user);
+        if (data.transactions) {
+          fetchRecentTransactions(data.transactions); // Fetch recent transactions only if they exist
+        }
       })
       .catch(err => console.error('Error fetching user data:', err));
     }
   }, []);
+
+  const fetchRecentTransactions = (transactions) => {
+    // Sort transactions by date and get the three most recent
+    const sortedTransactions = transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const recent = sortedTransactions.slice(0, 3).map(transaction => ({
+      date: new Date(transaction.date).toLocaleDateString(), // Format the date to only show the date
+      recipientName: transaction.recipient.name,
+      transactionId: transaction.transactionId,
+    }));
+    setRecentTransactions(recent); // Set the recent transactions
+  };
  
   if (!user) {
     return <p>Loading...</p>;
@@ -74,16 +89,16 @@ function Dashboard() {
           <thead>
             <tr>
               <th>Date</th>
-              <th>Details</th>
-              <th>Action</th>
+              <th>Recipient's Name</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            {transactions.length > 0 ? (
-              transactions.map((transaction, index) => (
+            {recentTransactions.length > 0 ? (
+              recentTransactions.map((transaction, index) => (
                 <tr key={index}>
                   <td>{transaction.date}</td>
-                  <td>{transaction.details}</td>
+                  <td>{transaction.recipientName}</td>
                   <td>
                     <button className="pay-again-button">Pay again</button>
                   </td>
