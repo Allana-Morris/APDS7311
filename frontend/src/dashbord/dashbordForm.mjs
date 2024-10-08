@@ -28,7 +28,11 @@ function Dashboard() {
   }
 
   const handleLocalPaymentClick = () => {
-    navigate('/payment'); // Navigate to /payment when button is clicked
+    navigate('/LocalPayment'); // Navigate to /LocalPayment when button is clicked
+  };
+
+  const handleInternationalPaymentClick = () => {
+    navigate('/InterPayment'); // Navigate to /internationalPayment when button is clicked
   };
 
   return (
@@ -53,7 +57,9 @@ function Dashboard() {
             <button className="local-payment" onClick={handleLocalPaymentClick}>
               Make Local Payment
             </button>
-            <button className="intl-payment">Make International Payment</button>
+            <button className="intl-payment" onClick={handleInternationalPaymentClick}>
+              Make International Payment
+            </button>
           </div>
           
           <div className="banking-details">

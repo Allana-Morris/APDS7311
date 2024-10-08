@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import './DetailsPayment.css';
+import './localPayment.css';
 
-function DetailsForm() {
+function LocalPaymentForm() {
+  // Declare Variables
   const [formData, setFormData] = useState({
     recipientName: '',
     recipientBank: '',
     accountNumber: '',
     amount: '',
-    swiftCode: '',
-    currency: 'USD' // Default currency set to USD
+    branch: '' // Change swiftCode to branch
   });
 
   // Get user input
@@ -23,49 +23,45 @@ function DetailsForm() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { recipientName, recipientBank, accountNumber, amount, swiftCode, currency } = formData;
+    const { recipientName, recipientBank, accountNumber, amount, branch } = formData;
 
     // Data Validation. Can't leave any blank
-    if (!recipientName || !recipientBank || !accountNumber || !amount || !swiftCode || !currency) {
+    if (!recipientName || !recipientBank || !accountNumber || !amount || !branch) {
       alert('Please fill out all fields before proceeding.');
       return;
     }
 
-    // Prepare the request body for the international payment
+    // Prepare data to send
     const paymentData = {
-      type: 'international',
+      type: 'local',
       recName: recipientName,
       recBank: recipientBank,
       recAccNo: accountNumber,
       amount: amount,
-      swift: swiftCode,
-      currency: currency
+      branch: branch
     };
 
     try {
-      // Get the token from localStorage
-      const token = localStorage.getItem('jwt');
-
-      // Make the POST request to the backend
+      // Send a POST request to the backend
       const response = await fetch('https://localhost:3001/users/payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Include JWT token for authentication
+          'Authorization': `Bearer ${localStorage.getItem('jwt')}` // Include JWT token for authentication
         },
         body: JSON.stringify(paymentData)
       });
 
-      // Handle the response from the server
-      const result = await response.json();
+      const data = await response.json();
+
       if (response.ok) {
-        alert(`Transaction successful: ${result.message}`);
+        alert(`Transaction successful: ${data.message}`);
       } else {
-        alert(`Error: ${result.message}`);
+        alert(`Error: ${data.message}`);
       }
     } catch (error) {
-      console.error('Error processing payment:', error);
-      alert('There was an error processing the payment. Please try again.');
+      console.error("Error processing payment:", error);
+      alert('An error occurred while processing your payment.');
     }
   };
 
@@ -76,14 +72,13 @@ function DetailsForm() {
       recipientBank: '',
       accountNumber: '',
       amount: '',
-      swiftCode: '',
-      currency: 'USD' // Reset currency to default
+      branch: '' // Change swiftCode to branch
     });
   };
 
   return (
     <div className="form-container">
-      <h2 className="form-title">International Payment Form</h2>
+      <h2 className="form-title">Local Payment Form</h2> {/* Title remains the same */}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="recipientName">Recipient's Name:</label>
@@ -134,35 +129,15 @@ function DetailsForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="swiftCode">Enter SWIFT Code:</label>
+          <label htmlFor="branch">Enter Branch:</label> {/* Updated label */}
           <input
             type="text"
-            id="swiftCode"
-            name="swiftCode"
-            value={formData.swiftCode}
+            id="branch"
+            name="branch" // Change swiftCode to branch
+            value={formData.branch}
             onChange={handleChange}
-            placeholder="Enter Bank SWIFT Code"
+            placeholder="Enter Bank Branch"
           />
-        </div>
-
-        {/* Currency Selection Combo Box */}
-        <div className="form-group">
-          <label htmlFor="currency">Currency:</label>
-          <select
-            id="currency"
-            name="currency"
-            value={formData.currency}
-            onChange={handleChange}
-          >
-            <option value="USD">USD - US Dollar</option>
-            <option value="EUR">EUR - Euro</option>
-            <option value="GBP">GBP - British Pound</option>
-            <option value="JPY">JPY - Japanese Yen</option>
-            <option value="AUD">AUD - Australian Dollar</option>
-            <option value="CAD">CAD - Canadian Dollar</option>
-            <option value="CNY">CNY - Chinese Yuan</option>
-            <option value="INR">INR - Indian Rupee</option>
-          </select>
         </div>
 
         <div className="form-actions">
@@ -174,4 +149,4 @@ function DetailsForm() {
   );
 }
 
-export default DetailsForm;
+export default LocalPaymentForm;
