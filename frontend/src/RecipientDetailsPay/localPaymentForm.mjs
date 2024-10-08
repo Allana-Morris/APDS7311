@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import './localPayment.css';
 
 function LocalPaymentForm() {
@@ -10,6 +11,8 @@ function LocalPaymentForm() {
     amount: '',
     branch: '' // Changed swiftCode to branch
   });
+
+  const navigate = useNavigate(); // Initialize useNavigate for redirecting
 
   // Get user input
   const handleChange = (e) => {
@@ -56,6 +59,7 @@ function LocalPaymentForm() {
 
       if (response.ok) {
         alert(`Transaction successful: ${data.message}`);
+        navigate('/dashboard'); // Navigate to the dashboard after successful payment
       } else {
         alert(`Error: ${data.message}`);
       }
@@ -65,7 +69,7 @@ function LocalPaymentForm() {
     }
   };
 
-  // Handle form reset
+  // Handle form reset and navigate to dashboard
   const handleReset = () => {
     setFormData({
       recipientName: '',
@@ -74,6 +78,8 @@ function LocalPaymentForm() {
       amount: '',
       branch: '' // Changed swiftCode to branch
     });
+
+    navigate('/home'); // Redirect to /home when cancel is clicked
   };
 
   return (
