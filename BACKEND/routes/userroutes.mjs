@@ -200,7 +200,7 @@ router.post('/', async (req, res) => {
 
   router.post("/payment", checkAuth, async (req, res) => {
     try {
-        const { type, recBank, recAccNo, amount, swift, branch, currency } = req.body; // Extract payment details from the request body
+        const { type, recBank, recAccNo, amount, swift, branch, currency, recName } = req.body; // Extract payment details from the request body
         const senderAccountNumber = req.user.accountNumber; // Get the logged-in user's account number from the token
 
         // Convert the amount to a number
@@ -208,11 +208,11 @@ router.post('/', async (req, res) => {
 
         // Validate input
         if (type === "local") {
-            if (!type || !recBank || !recAccNo || !amount || !branch) {
+            if (!type || !recBank || !recAccNo || !amount || !branch || !recName) {
                 return res.status(400).json({ message: "All fields are required for local payment." });
             }
         } else {
-            if (!type || !recBank || !recAccNo || !amount || !swift || !currency) {
+            if (!type || !recBank || !recAccNo || !amount || !swift || !currency || !recName) {
                 return res.status(400).json({ message: "All fields are required for international payment." });
             }
         }
@@ -239,6 +239,7 @@ router.post('/', async (req, res) => {
             type,
             sender: senderAccountNumber, // Store the sender's account number
             recipient: {
+                name: recName,
                 bank: recBank,
                 accountNumber: recAccNo,
             },

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
 import './localPayment.css';
 
 function LocalPaymentForm() {
@@ -9,10 +9,25 @@ function LocalPaymentForm() {
     recipientBank: '',
     accountNumber: '',
     amount: '',
-    branch: '' // Changed swiftCode to branch
+    branch: ''
   });
 
   const navigate = useNavigate(); // Initialize useNavigate for redirecting
+  const location = useLocation(); // Initialize useLocation to access passed state
+
+  // Autofill form fields if there's data in location.state
+  useEffect(() => {
+    if (location.state) {
+      const { amount, recipient, branch } = location.state;
+      setFormData({
+        recipientName: recipient.name || '',
+        recipientBank: recipient.bank || '', // Adjust based on your data structure
+        accountNumber: recipient.accountNumber || '',
+        amount: amount || '',
+        branch: branch, // Set branch to empty or provide default
+      });
+    }
+  }, [location.state]); // Run this effect when location.state changes
 
   // Get user input
   const handleChange = (e) => {
@@ -59,7 +74,7 @@ function LocalPaymentForm() {
 
       if (response.ok) {
         alert(`Transaction successful: ${data.message}`);
-        navigate('/dashboard'); // Navigate to the dashboard after successful payment
+        navigate('/Home'); // Navigate to the dashboard after successful payment
       } else {
         alert(`Error: ${data.message}`);
       }
@@ -76,7 +91,7 @@ function LocalPaymentForm() {
       recipientBank: '',
       accountNumber: '',
       amount: '',
-      branch: '' // Changed swiftCode to branch
+      branch: ''
     });
 
     navigate('/home'); // Redirect to /home when cancel is clicked
@@ -84,7 +99,7 @@ function LocalPaymentForm() {
 
   return (
     <div className="form-container">
-      <h2 className="form-title">Local Payment Form</h2> 
+      <h2 className="form-title">Local Payment Form</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="recipientName">Recipient's Name:</label>
@@ -135,11 +150,11 @@ function LocalPaymentForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="branch">Enter Branch:</label> 
+          <label htmlFor="branch">Enter Branch:</label>
           <input
             type="text"
             id="branch"
-            name="branch" // Changed swiftCode to branch
+            name="branch"
             value={formData.branch}
             onChange={handleChange}
             placeholder="Enter Bank Branch"

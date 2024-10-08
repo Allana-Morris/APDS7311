@@ -37,6 +37,24 @@ function Dashboard() {
     navigate('/InterPayment');
   };
 
+  const handlePayAgain = (transaction) => {
+    // Determine payment type (you can adjust this logic based on your needs)
+    const isLocalPayment = transaction.type === 'local'; // Assuming you have a type field in your transaction
+    const paymentPath = isLocalPayment ? '/LocalPayment' : '/InterPayment';
+
+    // Navigate to the payment screen and pass transaction data
+    navigate(paymentPath, {
+      state: {
+        amount: transaction.amount,
+        recipient: transaction.recipient,
+        swift: transaction.swift,
+        branch: transaction.branch,
+        currency: transaction.currency
+        // Add any other fields you need to autofill
+      }
+    });
+  };
+
   return (
     <div className="container">
       <h1 className="dashboard-title">Customer Dashboard</h1>
@@ -114,7 +132,7 @@ function Dashboard() {
                       <td style={amountStyle}>{displayAmount}</td> {/* Apply conditional styles */}
                       <td>
                         {isPayer && (
-                          <button className="pay-again-button">Pay again</button>
+                          <button className="pay-again-button" onClick={() => handlePayAgain(transaction)}>Pay again</button>
                         )}
                       </td>
                     </tr>

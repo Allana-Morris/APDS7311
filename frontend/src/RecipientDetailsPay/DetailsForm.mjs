@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
 import './DetailsPayment.css';
 
 function DetailsForm() {
@@ -13,6 +13,22 @@ function DetailsForm() {
   });
 
   const navigate = useNavigate(); // Initialize useNavigate for redirecting
+  const location = useLocation(); // Initialize useLocation to access passed state
+
+  // Autofill form fields if there's data in location.state
+  useEffect(() => {
+    if (location.state) {
+      const { amount, recipient, swift, currency } = location.state;
+      setFormData({
+        recipientName: recipient.name || '',
+        recipientBank: recipient.bank || '',
+        accountNumber: recipient.accountNumber || '',
+        amount: amount || '',
+        swiftCode: swift, // Set SWIFT code to empty or provide default if necessary
+        currency: currency // Keep default currency or set as needed
+      });
+    }
+  }, [location.state]); // Run this effect when location.state changes
 
   // Get user input
   const handleChange = (e) => {
@@ -63,8 +79,7 @@ function DetailsForm() {
       const result = await response.json();
       if (response.ok) {
         alert(`Transaction successful: ${result.message}`);
-        navigate('/dashboard'); // Navigate to the dashboard after successful payment
-
+        navigate('/Home'); // Navigate to the dashboard after successful payment
       } else {
         alert(`Error: ${result.message}`);
       }
