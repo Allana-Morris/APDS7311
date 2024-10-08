@@ -54,7 +54,7 @@ function Dashboard() {
     <div className="container">
         <h1 className="dashboard-title">Customer Dashboard</h1>
         <h2 className="welcome-message">Hello, {user.firstName} {user.lastName}</h2>
-        
+        <br></br>
         <div className="dashboard-main">
           <div className="payment-buttons">
             <button className="local-payment" onClick={handleLocalPaymentClick}>

@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center; /* Center all items */
   padding: 10px; /* Reduced padding */
-  border: 2px solid black; /* Black border around the main container */
+  border: 2px solid  #54A09B; /* Black border around the main container */
   margin: 0 auto; /* Center the container */
   min-width: 800px; /* Set a wide maximum width for the container */
   width: 100%;
@@ -38,7 +38,7 @@
 .banking-table {
   width: 100%; /* Make the table fill the width of the container */
   border-collapse: collapse; /* Collapse borders for table */
-  border: 1px solid black; /* Black border around the entire table */
+  border: 1px solid  #888888; /* Black border around the entire table */
 }
 
 .banking-table td {
@@ -60,7 +60,7 @@
 .receipts-table {
   width: 100%; /* Set the table width to 100% of the parent container */
   border-collapse: collapse; /* Optional: removes spacing between cells */
-  border: 1px solid black; /* Black border around the entire table */
+  border: 1px solid  #888888; /* Black border around the entire table */
 }
 
 .receipts-table th,
