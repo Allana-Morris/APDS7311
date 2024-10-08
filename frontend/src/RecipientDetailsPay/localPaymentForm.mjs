@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'; // Import useNaviga
 import './localPayment.css';
 
 function LocalPaymentForm() {
-  // Declare Variables
+  // Declares Variables
   const [formData, setFormData] = useState({
     recipientName: '',
     recipientBank: '',
@@ -12,24 +12,24 @@ function LocalPaymentForm() {
     branch: ''
   });
 
-  const navigate = useNavigate(); // Initialize useNavigate for redirecting
-  const location = useLocation(); // Initialize useLocation to access passed state
+  const navigate = useNavigate(); // Initializes useNavigate for redirecting
+  const location = useLocation(); // Initializes useLocation to access passed state
 
-  // Autofill form fields if there's data in location.state
+  // Autofills form fields if there's data in location.state
   useEffect(() => {
     if (location.state) {
       const { amount, recipient, branch } = location.state;
       setFormData({
         recipientName: recipient.name || '',
-        recipientBank: recipient.bank || '', // Adjust based on your data structure
+        recipientBank: recipient.bank || '',
         accountNumber: recipient.accountNumber || '',
         amount: amount || '',
-        branch: branch, // Set branch to empty or provide default
+        branch: branch, // Sets branch to empty
       });
     }
-  }, [location.state]); // Run this effect when location.state changes
+  }, [location.state]); // Runs this effect when location.state changes
 
-  // Get user input
+  // Gets user input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -38,7 +38,7 @@ function LocalPaymentForm() {
     });
   };
 
-  // Handle form submission
+  // Handles form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { recipientName, recipientBank, accountNumber, amount, branch } = formData;
@@ -49,7 +49,7 @@ function LocalPaymentForm() {
       return;
     }
 
-    // Prepare data to send
+    // Prepares data to send
     const paymentData = {
       type: 'local',
       recName: recipientName,
@@ -60,12 +60,12 @@ function LocalPaymentForm() {
     };
 
     try {
-      // Send a POST request to the backend
+      // Sends a POST request to the backend
       const response = await fetch('https://localhost:3001/users/Payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('jwt')}` // Include JWT token for authentication
+          'Authorization': `Bearer ${localStorage.getItem('jwt')}` // Includes JWT token for authentication
         },
         body: JSON.stringify(paymentData)
       });
@@ -74,7 +74,7 @@ function LocalPaymentForm() {
 
       if (response.ok) {
         alert(`Transaction successful: ${data.message}`);
-        navigate('/Home'); // Navigate to the dashboard after successful payment
+        navigate('/Home'); // Navigates to the dashboard after successful payment
       } else {
         alert(`Error: ${data.message}`);
       }
@@ -84,7 +84,7 @@ function LocalPaymentForm() {
     }
   };
 
-  // Handle form reset and navigate to dashboard
+  // Handles form reset and navigates to dashboard
   const handleReset = () => {
     setFormData({
       recipientName: '',
@@ -94,7 +94,7 @@ function LocalPaymentForm() {
       branch: ''
     });
 
-    navigate('/home'); // Redirect to /home when cancel is clicked
+    navigate('/home'); // Redirects to /home when cancel is clicked
   };
 
   return (

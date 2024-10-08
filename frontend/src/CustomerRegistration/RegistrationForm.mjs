@@ -15,8 +15,8 @@ const RegistrationForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [idNumber, setIdNumber] = useState('');
-  const [error, setError] = useState(null); // State for error messages
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Validation patterns
   const namePattern = /^[a-zA-Z\s-]+$/; // Allows letters, spaces, and hyphens
@@ -59,7 +59,7 @@ const RegistrationForm = () => {
           return;
       }
 
-       setError(null); // Clear any previous error
+       setError(null); // Clears any previous error
 
       try {
           const response = await fetch('https://localhost:3001/users/', {
@@ -82,6 +82,7 @@ const RegistrationForm = () => {
 
           if (response.ok) {
               alert('Registration successful!');
+              //Clears inputs 
               setFirstName('');
               setLastName('');
               setEmail('');
@@ -89,7 +90,7 @@ const RegistrationForm = () => {
               setConfirmPassword('');
               setAccountNumber('');
               setIdNumber('');
-              navigate('/Login'); // Uses navigate to redirect
+              navigate('/Login');
           } else {
               const errorMessage = data.message || 'Registration failed. Please try again.'; 
                alert('Registration failed: ' + errorMessage);
@@ -108,7 +109,7 @@ const RegistrationForm = () => {
       </Helmet>
     <form className="registration-form" onSubmit={handleSubmit}>
       <h2 className='customer-heading'>Customer Registration</h2>
-      {error && <div className="error-message">{error}</div>} {/* Display error messages */}
+      {error && <div className="error-message">{error}</div>} {/* Displays the error messages */}
       <div className="form-fields">
       <br></br>
       <div className="form-row">
@@ -191,7 +192,7 @@ const RegistrationForm = () => {
       </div>
       <div className="align-right">
       An existing customer?{' '}
-  <Link className="redirect-login" to="/Login">
+  <Link className="redirect-login" to="/Login"> {/*Redirects to Login if User already has an account*/}
     Click to Login
   </Link>
 </div>

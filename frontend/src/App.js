@@ -10,7 +10,6 @@ import { Route, Routes, BrowserRouter } from "react-router-dom";  // Import Brow
 function App() {
   return (
     <div>
-      {/* Wrap the Routes with BrowserRouter */}
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Reg />} />

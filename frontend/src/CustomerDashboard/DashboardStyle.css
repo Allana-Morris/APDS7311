@@ -25,26 +25,25 @@
 .dashboard-main {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center all items in the main dashboard */
-  width: 100%; /* Full width */
+  align-items: center; /* Centers all items in the main dashboard */
+  width: 100%;
 }
 
 .banking-details {
-  width: 80%; /* Adjust the width as necessary */
-  margin: 20px auto; /* Center the table */
+  width: 80%;
+  margin: 20px auto; /* Centers the table */
   cursor: default;
 }
 
 .banking-table {
-  width: 100%; /* Make the table fill the width of the container */
+  width: 100%; /* Makes the table fill the width of the container */
   border-collapse: collapse; /* Collapse borders for table */
   border: 1px solid  #888888; /* Black border around the entire table */
 }
 
 .banking-table td {
   padding: 10px; /* Padding for table cells */
-  /*border: 1px solid #ffffff;  Border for table cells */
-  text-align: start; /* Align text to the left */
+  text-align: start; /* Aligns text to the left */
 }
 
 .banking-table td:nth-child(odd) {
@@ -52,44 +51,41 @@
 }
 
 .payment-receipts {
-  margin: 5px auto; /* Space above the payment receipts section */
+  margin: 5px auto; /*Space above the payment receipts section */
   width: 80%;
   cursor: default;
 }
 
 .receipts-table {
-  width: 100%; /* Set the table width to 100% of the parent container */
-  border-collapse: collapse; /* Optional: removes spacing between cells */
+  width: 100%; 
+  border-collapse: collapse;
   border: 1px solid  #888888; /* Black border around the entire table */
 }
 
 .receipts-table th,
 .receipts-table td {
-  /*border: 1px solid white;  White borders for table cells */
-  padding: 8px; /* Add some padding for better readability */
+  padding: 8px; 
   text-align: center; /* Center-aligns the text */
 }
 
 .receipts-table th {
-  width: 33.33%; /* Set each header's width to one-third of the table */
+  width: 25%; /* Sets each header's width to one-quater of the table */
 }
 
 .pay-again-button {
   padding: 10px 20px; /* Larger button size */
- /* border: 2px solid black;  Thicker border */
   cursor: pointer; /* Pointer cursor on hover */
 }
 
-
 .payment-buttons {
   display: flex;
-  justify-content: center; /* Center the buttons */
+  justify-content: center; /* Centers the buttons */
   margin-bottom: 16px; /* Reduced space below the buttons */
 }
 
 .payment-buttons button {
-  padding: 12px 25px; /* Slightly smaller buttons */
-  font-size: 1rem; /* Slightly smaller font size */
+  padding: 12px 25px;
+  font-size: 1rem;
   margin: 0 8px; /* Reduced space between buttons */
   background-color: #54A09B;
   border: none;
@@ -98,11 +94,12 @@
 }
 
 .payment-buttons button:hover{
-  background-color: #468681;
+  background-color: #468681; /*Darker Button colour on hover*/
+  cursor: pointer;
 }
 
 .pay-again-button:hover{
-  background-color: #468681;
+  background-color: #468681;  /*Darker Button colour on hover*/
   cursor: pointer;
 }
 
@@ -111,15 +108,15 @@
 }
 
 .form-input {
-  padding: 8px; /* Reduced padding inside input fields */
-  font-size: 0.9rem; /* Slightly smaller font size for input fields */
+  padding: 8px;
+  font-size: 0.9rem;
   border: 1px solid #ccc; /* Light border for input fields */
-  width: 100%; /* Full width input fields */
+  width: 100%;
 
 }
 
 .pay-again-button {
-  padding: 8px 15px; /* Reduced button padding */
+  padding: 8px 15px;
   margin-top: 8px; /* Reduced space above button */
   background-color: #54A09B;
     color: white;

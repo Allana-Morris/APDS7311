@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import './DetailsPayment.css';
 
 function DetailsForm() {
@@ -12,8 +12,8 @@ function DetailsForm() {
     currency: 'USD' // Default currency set to USD
   });
 
-  const navigate = useNavigate(); // Initialize useNavigate for redirecting
-  const location = useLocation(); // Initialize useLocation to access passed state
+  const navigate = useNavigate(); // Initializes useNavigate for redirecting
+  const location = useLocation(); // Initializes useLocation to access passed state
 
   // Autofill form fields if there's data in location.state
   useEffect(() => {
@@ -24,13 +24,13 @@ function DetailsForm() {
         recipientBank: recipient.bank || '',
         accountNumber: recipient.accountNumber || '',
         amount: amount || '',
-        swiftCode: swift, // Set SWIFT code to empty or provide default if necessary
-        currency: currency // Keep default currency or set as needed
+        swiftCode: swift, // Sets SWIFT code to empty
+        currency: currency // Keeps default currency
       });
     }
-  }, [location.state]); // Run this effect when location.state changes
+  }, [location.state]); // Runs this effect when location.state changes
 
-  // Get user input
+  // Gets user input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -39,18 +39,18 @@ function DetailsForm() {
     });
   };
 
-  // Handle form submission
+  // Handles form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { recipientName, recipientBank, accountNumber, amount, swiftCode, currency } = formData;
 
-    // Data Validation. Can't leave any blank
+    // Data Validation.
     if (!recipientName || !recipientBank || !accountNumber || !amount || !swiftCode || !currency) {
       alert('Please fill out all fields before proceeding.');
       return;
     }
 
-    // Prepare the request body for the international payment
+    // Prepares the request body for the international payment
     const paymentData = {
       type: 'international',
       recName: recipientName,
@@ -62,24 +62,24 @@ function DetailsForm() {
     };
 
     try {
-      // Get the token from localStorage
+      // Gets the token from localStorage
       const token = localStorage.getItem('jwt');
 
-      // Make the POST request to the backend
+      // Makes the POST request to the backend
       const response = await fetch('https://localhost:3001/users/Payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Include JWT token for authentication
+          'Authorization': `Bearer ${token}` // Includes JWT token for authentication
         },
         body: JSON.stringify(paymentData)
       });
 
-      // Handle the response from the server
+      // Handles the response from the server
       const result = await response.json();
       if (response.ok) {
         alert(`Transaction successful: ${result.message}`);
-        navigate('/Home'); // Navigate to the dashboard after successful payment
+        navigate('/Home'); // Navigates to the dashboard after successful payment
       } else {
         alert(`Error: ${result.message}`);
       }
@@ -89,7 +89,7 @@ function DetailsForm() {
     }
   };
 
-  // Handle form reset and navigate to dashboard
+  // Handles form reset and navigate to dashboard
   const handleReset = () => {
     setFormData({
       recipientName: '',
@@ -97,10 +97,10 @@ function DetailsForm() {
       accountNumber: '',
       amount: '',
       swiftCode: '',
-      currency: 'USD' // Reset currency to default
+      currency: 'USD' // Resets currency to default
     });
 
-    navigate('/home'); // Redirect to /home when cancel is clicked
+    navigate('/home'); // Redirects to /home when cancel is clicked
   };
 
   return (
