@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import Reg from "./CustomerRegistration/RegistrationForm.mjs";
 import Log from "./CustomerLogin/LoginForm.mjs"
