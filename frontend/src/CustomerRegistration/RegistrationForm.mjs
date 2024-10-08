@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Link } from 'react-router-dom';
 import './RegisterStyles.css'; // Import the CSS file
 
-function RegistrationForm() {
+const RegistrationForm = () => {
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -13,60 +14,90 @@ function RegistrationForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [idNumber, setIdNumber] = useState('');
+  const [error, setError] = useState(null); // State for error messages
   const navigate = useNavigate(); // Initialize useNavigate
 
+  // Validation patterns
+  const namePattern = /^[a-zA-Z\s-]+$/; // Allows letters, spaces, and hyphens
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co\.za)$/; // Valid email format
+  const accountNumberPattern = /^\d{6,11}$/; // South African bank account number validation
+  const southAfricanIDPattern = /^(?!000000)(\d{2})(\d{2})(\d{2})(\d{4})([01])(\d)(\d)$/; // SA ID validation
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/; // Password validation
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
+      e.preventDefault(); // Prevents the default form submission
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
-
-    try {
-      // Send the registration request to the backend
-      console.log("henlo")
-      const response = await fetch('https://localhost:3001/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          firstName, 
-          lastName, 
-          email, 
-          password, 
-          confirmPassword, 
-          accountNumber, 
-          idNumber 
-        }),
-      });
-
-      console.log("benlo")
-
-
-      const data = await response.json();
-
-      console.log("menlo")
-      if (response.ok) {
-        alert('Registration successful!');
-        // Redirect to the login page after successful registration
-        navigate('/login'); // Use navigate to redirect
-      } else {
-        // Display an error message if registration failed
-        // Access the error message from the data object
-        const errorMessage = data.errorMessage;
-        alert('Registration failed: ' + errorMessage);
+      // Input validation
+      if (!namePattern.test(firstName) || !namePattern.test(lastName)) {
+          setError('Invalid name. Only letters, spaces, and hyphens are allowed.');
+          return;
       }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Registration error: ' + error.message);
-    }
+
+      if (!emailPattern.test(email)) {
+          setError('Invalid email format. Please use a valid email.');
+          return;
+      }
+
+      if (!accountNumberPattern.test(accountNumber)) {
+          setError('Invalid bank account number. It should be between 6 and 11 digits.');
+          return;
+      }
+
+      if (!southAfricanIDPattern.test(idNumber)) {
+          setError('Invalid South African ID number.');
+          return;
+      }
+
+      if (!passwordPattern.test(password)) {
+          setError('Password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+          return;
+      }
+
+      if (password !== confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+      }
+
+       setError(null); // Clear any previous error
+
+      try {
+          const response = await fetch('https://localhost:3001/users/', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  firstName,
+                  lastName,
+                  email,
+                  password,
+                  confirmPassword,
+                  accountNumber,
+                  idNumber,
+              }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+              alert('Registration successful!');
+              navigate('/Login'); // Uses navigate to redirect
+          } else {
+              const errorMessage = data.message || 'Registration failed. Please try again.'; 
+               alert('Registration failed: ' + errorMessage);
+          }
+      } catch (error) {
+          console.error('Error:', error);
+          alert('Registration error: ' + error.message);
+      }
   };
 
   return (
     <form className="registration-form" onSubmit={handleSubmit}>
-      <h2>Customer Registration Form</h2>
+      <h2 className='customer-heading'>Customer Registration Form</h2>
+      {error && <div className="error-message">{error}</div>} {/* Display error messages */}
+      <div className="form-fields">
+      <br></br>
       <div className="form-row">
         <input
           className="form-input"
@@ -76,6 +107,7 @@ function RegistrationForm() {
           onChange={(e) => setFirstName(e.target.value)}
           required
         />
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
         <input
           className="form-input"
           type="text"
@@ -104,6 +136,7 @@ function RegistrationForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
         <input
           className="form-input"
           type="password"
@@ -122,6 +155,7 @@ function RegistrationForm() {
           onChange={(e) => setAccountNumber(e.target.value)}
           required
         />
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
         <input
           className="form-input"
           type="text"
@@ -130,16 +164,26 @@ function RegistrationForm() {
           onChange={(e) => setIdNumber(e.target.value)}
           required
         />
+        <div>
+        <br>
+        </br>
+      </div>
       </div>
       <button className="submit-button" type="submit">Submit</button>
       <div>
+        <br>
         
+        </br>
       </div>
-      <div><Link to="/login">
-          An existing customer? Click to Login
-        </Link>
-    </div>
+      </div>
+      <div className="align-right">
+      An existing customer?{' '}
+  <Link className="redirect-login" to="/Login">
+    Click to Login
+  </Link>
+</div>
     </form>
+    
   );
 }
 

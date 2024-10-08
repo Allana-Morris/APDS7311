@@ -22,15 +22,14 @@ body {
   width: 300px;
   background-color: white;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  border: 2px solid #E2B8A2;
+  border: 2px solid #54A09B;
 }
 
 .login-form h2 {
   text-align: center;
-  border: 2px dashed green;
   padding: 5px;
   margin-bottom: 20px;
-  color: #333;
+  color: #000000;
 }
 
 .login-form label {
@@ -41,17 +40,17 @@ body {
 }
 
 .login-form input {
-  width: 100%;
+  width: 93%;
   padding: 10px;
   margin-bottom: 15px;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
 }
 
 .login-form button {
   width: 100%;
   padding: 10px;
-  background-color: #2E576F;
+  background-color: #54A09B;
   border: none;
   color: white;
   font-size: 16px;
@@ -60,6 +59,6 @@ body {
 }
 
 .login-form button:hover {
-  background-color: #1F4056;
+  background-color: #468681;
 }
 

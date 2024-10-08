@@ -1,4 +1,4 @@
-import './Dashboard.css';
+import './DashboardStyle.css';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
@@ -9,7 +9,7 @@ function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem('jwt');
     if (token) {
-      fetch('https://localhost:3001/users/dash', {
+      fetch('https://localhost:3001/users/Home', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -39,16 +39,17 @@ function Dashboard() {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Customer Dashboard</h1>
+        <br></br>
         <h2>Hello, {user.firstName} {user.lastName}</h2>
       </header>
       
       <div className="dashboard-body">
         <div className="side-menu">
-          <h3>Menu</h3>
-          <ul>
+         { /* <h3>Menu</h3>
+          <ul> 
             <li>Transactions</li>
             <li>Payments</li>
-          </ul>
+          </ul> */}
         </div>
         
         <div className="dashboard-main">
@@ -65,18 +66,16 @@ function Dashboard() {
             <h3>Banking Details</h3>
             <p>Current Acc: {user.accountNumber}</p>
             {/* Display the available balance from the backend */}
-            <p>Available Balance: ${user.balance.toFixed(2)}</p>
+            <p>Available Balance: R{user.balance.toFixed(2)}</p>
           </div>
 
           <div className="payment-receipts">
             <h3>Payment Receipts</h3>
             <div className="receipt">
-              <p>2024/08/20 - Sch Fees - $200</p>
-              <button>Pay again</button>
+              
             </div>
             <div className="receipt">
-              <p>2024/08/20 - Home R - $100</p>
-              <button>Pay again</button>
+              
             </div>
           </div>
         </div>
