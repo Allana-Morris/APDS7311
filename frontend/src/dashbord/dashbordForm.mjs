@@ -17,7 +17,7 @@ function Dashboard() {
       })
       .then(response => response.json())
       .then(data => {
-        setUser(data.user); // Set the fetched user data
+        setUser(data.user); // Set the fetched user data including balance
       })
       .catch(err => console.error('Error fetching user data:', err));
     }
@@ -32,14 +32,13 @@ function Dashboard() {
   };
 
   const handleInternationalPaymentClick = () => {
-    navigate('/InterPayment'); // Navigate to /internationalPayment when button is clicked
+    navigate('/InterPayment'); // Navigate to /InternationalPayment when button is clicked
   };
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Customer Dashboard</h1>
-        {/* Display the user's first and last name here */}
         <h2>Hello, {user.firstName} {user.lastName}</h2>
       </header>
       
@@ -65,7 +64,8 @@ function Dashboard() {
           <div className="banking-details">
             <h3>Banking Details</h3>
             <p>Current Acc: {user.accountNumber}</p>
-            <p>Available Balance: $1500.00</p>
+            {/* Display the available balance from the backend */}
+            <p>Available Balance: ${user.balance.toFixed(2)}</p>
           </div>
 
           <div className="payment-receipts">

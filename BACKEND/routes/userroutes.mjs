@@ -171,7 +171,9 @@ router.post('/register', async (req, res) => {
                   firstName: user.firstName,
                   lastName: user.lastName,
                   email: user.email,
-                  accountNumber: user.accountNumber
+                  accountNumber: user.accountNumber,
+                  balance: user.balance // Assuming balance is stored in the 'balance' field
+
               }
           });
       } catch (error) {
@@ -202,6 +204,12 @@ router.post('/register', async (req, res) => {
             return res.status(404).json({ message: "User not found." });
         }
 
+        // Check if the user has enough balance
+        const userBalance = user.balance; // Assuming the user's balance is stored in the 'balance' field
+        if (userBalance < amount) {
+            return res.status(400).json({ message: "Insufficient funds." });
+        }
+
         // Create a transaction object
         const transaction = {
             transactionId: `txn_${Date.now()}`, // Create a unique transaction ID
@@ -219,10 +227,19 @@ router.post('/register', async (req, res) => {
             date: new Date(),
         };
 
+        // Deduct the amount from the user's balance
+        const newBalance = userBalance - amount;
+
+        // Update the user's balance in the database
+        await db.collection('Users').updateOne(
+            { accountNumber: senderAccountNumber },
+            { $set: { balance: newBalance } }
+        );
+
         // Save the transaction in the Transactions collection
         await db.collection('Transactions').insertOne(transaction);
 
-        res.status(201).json({ message: "Transaction added successfully!", transaction });
+        res.status(201).json({ message: "Transaction added successfully!", transaction, newBalance });
     } catch (error) {
         console.error("Error processing payment:", error);
         res.status(500).json({ message: "Internal server error." });
