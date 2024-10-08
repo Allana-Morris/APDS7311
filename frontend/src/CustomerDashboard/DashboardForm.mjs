@@ -69,15 +69,29 @@ function Dashboard() {
   <h3 style={{ textAlign: 'center' }}>Banking Details</h3>
   <table className="banking-table">
           <tbody>
-            <tr>
-            <td>Current Acc</td>
+          <tr>
+              <br></br>
             </tr>
             <tr>
-              <td>Acc No:</td>
-              <td>{user.accountNumber}</td>
-              <td style={{ width: '20%' }}></td> 
-              <td>Available Bal:</td>
-              <td>{`R ${user.balance ? user.balance.toFixed(2) : '0.00'}`}</td>
+              <td width={"10%"}></td>
+            <td style={{fontWeight: 'bolder'}}>Current Acc</td>
+            <td></td>
+            <td></td>
+            </tr>
+            <tr>
+            <td width={"10%"}></td>
+              <td style={{fontWeight: 'bold'}}>Acc No:</td>
+              <td></td>
+              <td style={{fontWeight: 'bold'}}>Available Bal:</td>
+            </tr>
+            <tr>
+            <td width={"10%"}></td>
+            <td>{user.accountNumber}</td>
+            <td></td>
+            <td>{`R${user.balance ? user.balance.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',') : '0,00'}`}</td>
+            </tr>
+            <tr>
+              <br></br>
             </tr>
           </tbody>
         </table>

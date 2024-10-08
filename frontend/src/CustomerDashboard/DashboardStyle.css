@@ -32,45 +32,54 @@
 .banking-details {
   width: 80%; /* Adjust the width as necessary */
   margin: 20px auto; /* Center the table */
+  cursor: default;
 }
 
 .banking-table {
   width: 100%; /* Make the table fill the width of the container */
   border-collapse: collapse; /* Collapse borders for table */
+  border: 1px solid black; /* Black border around the entire table */
 }
 
 .banking-table td {
   padding: 10px; /* Padding for table cells */
-  border: 1px solid #ddd; /* Border for table cells */
-  text-align: left; /* Align text to the left */
+  /*border: 1px solid #ffffff;  Border for table cells */
+  text-align: start; /* Align text to the left */
 }
 
 .banking-table td:nth-child(odd) {
   background-color: #f9f9f9; /* Light background for odd cells */
 }
 
+.payment-receipts {
+  margin: 20px auto; /* Space above the payment receipts section */
+  width: 80%;
+  cursor: default;
+}
+
 .receipts-table {
-  width: 100%; /* Full width */
-  border-collapse: collapse; /* Collapse borders */
-  margin: 20px 0; /* Spacing around the table */
+  width: 100%; /* Set the table width to 100% of the parent container */
+  border-collapse: collapse; /* Optional: removes spacing between cells */
+  border: 1px solid black; /* Black border around the entire table */
 }
 
 .receipts-table th,
 .receipts-table td {
-  border: 1px solid black; /* Border for table cells */
-  padding: 10px; /* Cell padding */
-  text-align: center; /* Center text */
+  /*border: 1px solid white;  White borders for table cells */
+  padding: 8px; /* Add some padding for better readability */
+  text-align: center; /* Center-aligns the text */
+}
+
+.receipts-table th {
+  width: 33.33%; /* Set each header's width to one-third of the table */
 }
 
 .pay-again-button {
   padding: 10px 20px; /* Larger button size */
-  border: 2px solid black; /* Thicker border */
+ /* border: 2px solid black;  Thicker border */
   cursor: pointer; /* Pointer cursor on hover */
 }
 
-.payment-receipts {
-  margin-top: 20px; /* Space above the payment receipts section */
-}
 
 .payment-buttons {
   display: flex;
@@ -88,6 +97,15 @@
   cursor: pointer; /* Pointer on hover */
 }
 
+.payment-buttons button:hover{
+  background-color: #468681;
+}
+
+.pay-again-button:hover{
+  background-color: #468681;
+  cursor: pointer;
+}
+
 .form-group {
   margin-bottom: 12px; /* Reduced space below each form group */
 }
@@ -97,6 +115,7 @@
   font-size: 0.9rem; /* Slightly smaller font size for input fields */
   border: 1px solid #ccc; /* Light border for input fields */
   width: 100%; /* Full width input fields */
+
 }
 
 .pay-again-button {
