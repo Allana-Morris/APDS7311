@@ -1,15 +1,13 @@
-# This config was automatically generated from your source code
-# Stacks detected: cicd:github-actions:.github/workflows,deps:node:BACKEND,test:jest:
 version: 2.1
 orbs:
   node: circleci/node@5
 jobs:
-  test-node:
-    # Install node dependencies and run tests
+  test-backend:
+    # Job to test backend code
     executor: node/default
     working_directory: ~/project/BACKEND
     environment:
-      JEST_JUNIT_OUTPUT_DIR: ./test-results/
+      JEST_JUNIT_OUTPUT_DIR: ./test-results/backend/
     steps:
       - checkout:
           path: ~/project
@@ -18,26 +16,32 @@ jobs:
       - run:
           command: npm install jest-junit
       - run:
-          name: Run tests
+          name: Run backend tests
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - store_test_results:
-          path: ./test-results/
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
+          path: ./test-results/backend/
+
+  test-frontend:
+    # Job to test frontend code
+    executor: node/default
+    working_directory: ~/project/FRONTEND
+    environment:
+      JEST_JUNIT_OUTPUT_DIR: ./test-results/frontend/
     steps:
-      # Replace this with steps to deploy to users
+      - checkout:
+          path: ~/project
+      - node/install-packages:
+          pkg-manager: npm
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          command: npm install jest-junit
       - run:
-          name: found github actions config
-          command: ':'
+          name: Run frontend tests
+          command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
+      - store_test_results:
+          path: ./test-results/frontend/
+
 workflows:
   build-and-test:
     jobs:
-      - test-node
-    # - deploy:
-    #     requires:
-    #       - test-node
+      - test-backend
+      - test-frontend
