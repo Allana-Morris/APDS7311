@@ -1,5 +1,5 @@
 const { authenticateUser } = require('./authController.js'); // Import the authenticateUser function
-const { bcrypt } = require('bcrypt');
+const { bcrypt } = require('bcryptjs');
 
 // Mock the User model or any database call
 jest.mock('./models/User', () => ({
