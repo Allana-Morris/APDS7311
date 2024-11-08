@@ -9,8 +9,7 @@ jest.mock('jsonwebtoken', () => ({
 
 // Mock request, response, and next
 const mockRequest = () => {
-  const token = jwt.sign({ userId: 1, username: 'testUser' }, 'your_secret_key', { expiresIn: '1h' });
-
+  const token = jwt.sign({ accountNumber: '111000' }, 'your_secret_key', { expiresIn: '1h' });
   return {
     headers: {
       authorization: `Bearer ${token}`, // Mock valid token
@@ -40,8 +39,7 @@ describe('checkAuth middleware', () => {
 
     // Mocking jwt.verify to simulate token verification success
     jest.spyOn(jwt, 'verify').mockImplementation(() => ({
-      userId: 1,
-      username: 'testuser'
+      accountNumber: '012345'
     }));
 
     // Call the middleware

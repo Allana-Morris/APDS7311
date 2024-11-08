@@ -2,6 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node server.mjs",
     "dev": "nodemon server.mjs",
@@ -13,7 +14,8 @@
   "description": "",
   "devDependencies": {
     "jest": "^29.7.0",
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "supertest": "^7.0.0"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
