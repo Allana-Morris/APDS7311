@@ -1,5 +1,5 @@
 // test.js
-const { authenticateUser } = require('./checkAuth.mjs'); // Adjust path as needed
+const { authenticateUser } = require('./checkAuth.js'); // Adjust path as needed
 
 describe('Authentication Module', () => {
   test('should authenticate valid user credentials', async () => {
