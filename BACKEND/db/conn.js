@@ -13,6 +13,7 @@ let db;
 // Connect to MongoDB and assign `db` when the connection is successful
 const connectToDatabase = client.connect()
     .then((connection) => {
+      //  console.log("Connected to MongoDB");
         //  console.log("Connected to MongoDB");
         db = connection.db("APDSPOE");
         return db;  // Return the db instance for immediate use in the promise chain if needed
