@@ -82,6 +82,8 @@ router.post('/', async (req, res) => {
 
         // Insert the new user into the database
         await db.collection('Users').insertOne(newUser);
+        console.log(newUser);
+        console.log(res.status);
 
         res.status(201).json({ message: 'User registered successfully!' });
     } catch (error) {
