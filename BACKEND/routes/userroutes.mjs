@@ -338,10 +338,18 @@ router.post('/', async (req, res) => {
         {
         const { username, password } = req.body;
     
+        // Input validation
+        if (!username || !password) {
+            return res.status(400).json({ message: "Username and password are required." });
+        }
+
         try {
+            // Sanitize inputs
+            const sanitizedUsername = validator.escape(username);
+
             // Look up employee by username in the Employees collection
             const collection = await db.collection("Employees");
-            const employee = await collection.findOne({ username });
+            const employee = await collection.findOne({ username: sanitizedUsername });
     
             // Employee not found
             if (!employee) {
@@ -378,9 +386,8 @@ router.post('/', async (req, res) => {
 
     router.get("/employeeHome", checkAuth, async (req, res) => { //make sure to check auth alng side it
         try {
-      
-            //get the account number from the token
-          const username = req.user.username;
+            // Sanitize token payload
+            const username = validator.escape(req.user.username); 
       
           //get user data from the db
           const employee = await db.collection('Employees').findOne({ username: username });
@@ -412,15 +419,22 @@ router.post('/', async (req, res) => {
 
     router.get("/verify", checkAuth, async (req, res) => {
         try {
-            const { recipientName, recipientBank, accountNumber, swiftCode, field } = req.query;
-    
+            //Sanitize database query
+            const sanitizedQuery = {
+                recipientName: validator.escape(req.query.recipientName || ''),
+                recipientBank: validator.escape(req.query.recipientBank || ''),
+                accountNumber: sanitize(req.query.accountNumber || ''),
+                swiftCode: validator.escape(req.query.swiftCode || ''),
+                field: validator.escape(req.query.field || '')
+            };
+            
             // Check for missing fields and respond with an error if any are missing
-            if (!field) {
-                return res.status(400).json({ message: "Field to verify is required" });
+            if (!sanitizedQuery.field) {
+                return res.status(400).json({ message: "Field to verify is required." });
             }
-    
+
             // Query the internationalUsers collection to find the user with the given account number
-            const user = await db.collection("internationalUsers").findOne({ accountNumber });
+            const user = await db.collection("internationalUsers").findOne({ accountNumbe: sanitizedQuery.accountNumber });
     
             // If the user does not exist, return an error message
             if (!user) {
@@ -428,47 +442,37 @@ router.post('/', async (req, res) => {
             }
     
             // Perform the field verification based on the received field
-            switch (field) {
+            switch (sanitizedQuery.field) {
                 case "recipientName":
-                    if (!recipientName) {
-                        return res.status(400).json({ message: "Recipient name is required" });
-                    }
-                    if (user.name !== recipientName) {
-                        return res.status(400).json({ message: "Recipient name does not match" });
+                    if (user.name !== sanitizedQuery.recipientName) {
+                        return res.status(400).json({ message: "Recipient name does not match." });
                     }
                     break;
     
                 case "recipientBank":
-                    if (!recipientBank) {
-                        return res.status(400).json({ message: "Recipient bank is required" });
-                    }
-                    if (user.bank !== recipientBank) {
-                        return res.status(400).json({ message: "Recipient bank does not match" });
+                    if (user.bank !== sanitizedQuery.recipientBank) {
+                        return res.status(400).json({ message: "Recipient bank does not match." });
                     }
                     break;
     
                 case "accountNumber":
-                    // Account number is already validated by finding the user in the collection
-                    if (user.accountNumber !== accountNumber) {
-                        return res.status(400).json({ message: "this one i dont get" });
+                    if (user.accountNumber !== sanitizedQuery.accountNumber) {
+                        return res.status(400).json({ message: "Account number does not match." });
                     }
                     break;
     
                 case "swiftCode":
-                    if (!swiftCode) {
-                        return res.status(400).json({ message: "Swift code is required" });
-                    }
-                    if (user.swiftCode !== swiftCode) {
-                        return res.status(400).json({ message: "Swift code does not match" });
+                    if (user.swiftCode !== sanitizedQuery.swiftCode) {
+                        return res.status(400).json({ message: "Swift code does not match." });
                     }
                     break;
     
                 default:
-                    return res.status(400).json({ message: "Invalid field to verify" });
+                    return res.status(400).json({ message: "Invalid field to verify." });
             }
     
             // Return a successful response after verification
-            res.status(200).json({ message: `${field} verification successful` });
+            res.status(200).json({ message: `${sanitizedQuery.field} verification successful.` });
     
         } catch (error) {
             console.error("Error during verification:", error);
@@ -479,10 +483,17 @@ router.post('/', async (req, res) => {
 router.post("/ProcessPay", checkAuth, async (req, res) => {
   try {
     // Destructure transactionId from the request body
-    const { recipientName, recipientBank, accountNumber, swiftCode, transactionId } = req.body;
+    //Sanitize database query
+    const sanitizedBody = {
+        recipientName: validator.escape(req.body.recipientName || ''),
+        recipientBank: validator.escape(req.body.recipientBank || ''),
+        accountNumber: sanitize(req.body.accountNumber || ''),
+        swiftCode: validator.escape(req.body.swiftCode || ''),
+        transactionId: sanitize(req.body.transactionId || '')
+    };
 console.log(transactionId)
     // Step 1: Fetch the transaction document using transactionId
-    const transaction = await db.collection("Transactions").findOne({ transactionId: transactionId });
+    const transaction = await db.collection("Transactions").findOne({ transactionId: sanitizedBody.transactionId });
     if (!transaction) {
       return res.status(404).json({ message: "Transaction not found" });
     }
@@ -519,11 +530,11 @@ console.log(transactionId)
 });
 
 router.post("/rejectPay", checkAuth, async (req, res) => {
-    const { recipientName, recipientBank, accountNumber, swiftCode, transactionId } = req.body;
+    const sanitizedTransactionId = sanitize(req.body.transactionId || '');
 
   console.log(transactionId);
     try {
-      const result = await db.collection('Transactions').deleteOne({ transactionId: transactionId });
+        const result = await db.collection('Transactions').deleteOne({ transactionId: sanitizedTransactionId });
   
       if (result.deletedCount === 1) {
         res.status(200).json({ message: "Transaction successfully removed." });
@@ -537,14 +548,4 @@ router.post("/rejectPay", checkAuth, async (req, res) => {
   });
   
   
-
-
-
-    
-
-
-
-
-
-    
 export default router;
