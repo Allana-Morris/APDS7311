@@ -527,11 +527,10 @@ router.post("/ProcessPay", checkAuth, async (req, res) => {
     const sanitizedBody = {
         recipientName: validator.escape(req.body.recipientName || ''),
         recipientBank: validator.escape(req.body.recipientBank || ''),
-        accountNumber: sanitize(req.body.accountNumber || ''),
+        accountNumber: validator.escape(req.body.accountNumber || ''),
         swiftCode: validator.escape(req.body.swiftCode || ''),
-        transactionId: sanitize(req.body.transactionId || '')
+        transactionId: validator.escape(req.body.transactionId || '')
     };
-console.log(transactionId)
     // Step 1: Fetch the transaction document using transactionId
     const transaction = await db.collection("Transactions").findOne({ transactionId: sanitizedBody.transactionId });
     if (!transaction) {
@@ -557,7 +556,7 @@ console.log(transactionId)
     // Step 3: Set the transaction's approved field to true
     transaction.approved = true;
     await db.collection('Transactions').updateOne(
-        { transactionId: transactionId },
+        { transactionId: sanitizedBody.transactionId },
         { $set: { approved: true } }
     );
 
