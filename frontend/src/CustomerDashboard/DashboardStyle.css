@@ -2,11 +2,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px;
+  padding: 20px; /* Increased padding */
   border: 2px solid #54A09B;
   margin: 0 auto;
-  min-width: 800px;
-  width: 100%;
+  min-width: 1600px; /* Slightly increased minimum width */
+  width: 95%; /* More flexible for wider screens */
+  max-width: 1800px; /* Restrict max width */
   background-color: #f9f9f9;
   min-height: 800px;
   max-height: 800px;
@@ -26,17 +27,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  width: 100%; /* Keeps main dashboard full width */
 }
 
 .payment-buttons {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* Spreads buttons across the width */
   margin-bottom: 16px;
+  width: 80%; /* Increases button container width */
 }
 
 .payment-buttons button {
-  padding: 12px 25px;
+  padding: 12px 30px; /* Increased padding for larger buttons */
   font-size: 1rem;
   margin: 0 8px;
   background-color: #54A09B;
@@ -49,72 +51,67 @@
   background-color: #468681;
 }
 
-.banking-details {
-  width: 80%;
-  margin: 20px auto;
-}
-
-.banking-title {
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-.banking-table {
-  width: 100%;
+.banking-details .banking-table {
+  width: 90%; /* Sets tables close to full container width */
+  margin: 0 auto; /* Centers the tables within the container */
   border-collapse: collapse;
-  margin-top: 20px;
+  text-align: center;
 }
 
-.banking-table th, .banking-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid white;
-}
-
-.banking-table th {
-  background-color: white;
+.banking-details .banking-heading {
+  background-color: #E6F7F5;
+  padding: 10px;
   font-weight: bold;
-  text-transform: uppercase;
 }
 
-.banking-table td {
-  background-color: white; /* Keep <td> cells white */
+.banking-details td {
+  padding: 10px;
+  text-align: center !important;
+  background-color: #fff !important;
 }
 
-.empty-cell {
-  background-color: white; /* Empty cell with no background */
+.banking-details td:empty {
+  background-color: #fff !important;
 }
 
 .payment-receipts {
-  margin: 5px auto;
-  width: 80%;
+  width: 100%; /* Expands payment receipts table width */
+  margin: 10px auto;
   overflow-y: auto;
-  max-height: 300px;
+  max-height: 500px; /* Increased max height */
 }
 
 .receipts-table {
-  width: 100%;
+  width: 100%; /* Sets table close to full container width */
   border-collapse: collapse;
   border: 1px solid #888888;
 }
 
 .receipts-table th, .receipts-table td {
-  padding: 8px;
   text-align: center;
+  width: 10%;
 }
 
-.amount-red {
-  color: red;
-  white-space: nowrap;
+/* Column 2: Increased width */
+.receipts-table th:nth-child(2),
+.receipts-table td:nth-child(2) {
+  width: 16%; /* Expand the second column */
 }
 
-.amount-green {
-  color: green;
-  white-space: nowrap;
+/* Column 4: Increased width */
+.receipts-table th:nth-child(4),
+.receipts-table td:nth-child(4) {
+  width: 18%; /* Expand the fourth column */
+}
+
+/* Column 6 (Action): Fixed width */
+.receipts-table th:nth-child(6),
+.receipts-table td:nth-child(6) {
+  width: 140px; /* Keeps the Action column width fixed at 130px */
 }
 
 .pay-again-button {
-  padding: 8px 15px;
+  padding: 10px 10px; /* Increased padding */
   background-color: #54A09B;
   color: white;
   border: none;
