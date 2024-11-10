@@ -96,11 +96,12 @@ function Dashboard() {
           <table className="receipts-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
-                <th style={{ width: '20%' }}>Date</th>
-                <th style={{ width: '20%' }}>Payer</th>
-                <th style={{ width: '20%' }}>Recipient</th>
-                <th style={{ width: '20%' }}>Amount</th>
-                <th></th>
+                <th style={{ width: '15%' }}>Date</th>
+                <th style={{ width: '15%' }}>Payer</th>
+                <th style={{ width: '15%' }}>Recipient</th>
+                <th style={{ width: '15%' }}>Amount</th>
+                <th style={{ width: '15%' }}>Status</th> {/* New Pending Column */}
+                <th style={{ width: '25%' }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -119,18 +120,15 @@ function Dashboard() {
                       }).replace(/,/g, ' ').replace('.', ',')}`;
 
                   const amountStyle = isPayer ? { color: 'red' } : { color: 'green' };
+                  const isPending = !transaction.approved; // Check if pending
 
                   return (
                     <tr key={index}>
                       <td>{new Date(transaction.date).toLocaleDateString()}</td>
                       <td>{isPayer ? `${user.firstName} ${user.lastName}` : transaction.sender}</td>
                       <td>{transaction.recipient.name}</td>
-                      <td>
-                        <div style={amountStyle}>{displayAmount}</div>
-                        {!transaction.approved && (
-                          <div style={{ color: 'blue', fontWeight: 'bold' }}>Pending</div>
-                        )}
-                      </td>
+                      <td style={amountStyle}>{displayAmount}</td>
+                      <td>{isPending ? 'Pending' : 'Approved'}</td> {/* Pending column */}
                       <td>
                         {isPayer && (
                           <button
@@ -146,7 +144,7 @@ function Dashboard() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center' }}>No transactions found.</td>
+                  <td colSpan="6" style={{ textAlign: 'center' }}>No transactions found.</td>
                 </tr>
               )}
             </tbody>
