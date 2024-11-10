@@ -94,7 +94,7 @@ function LocalPaymentForm() {
       branch: ''
     });
 
-    navigate('/home'); // Redirects to /home when cancel is clicked
+    navigate('/Home'); // Redirects to /home when cancel is clicked
   };
 
   return (
