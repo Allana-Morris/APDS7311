@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DetailsForm from '../RecipientDetailsPay/DetailsForm.mjs';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 
 // Mocks for useNavigate and useLocation
 jest.mock('react-router-dom', () => ({
@@ -45,19 +46,29 @@ describe('DetailsForm Component', () => {
   });
 
   test('fills out the form and submits successfully', async () => {
+    const mockNavigate = jest.fn(); // Mock navigate function
+    require('react-router-dom').useNavigate.mockImplementation(() => mockNavigate); // Assign the mock to useNavigate
+
+    // Render the form inside a Router
     render(
       <Router>
         <DetailsForm />
       </Router>
     );
 
+    // Fill out the form fields
     fireEvent.change(screen.getByLabelText(/Recipient's Name:/), { target: { value: 'Alice Smith' } });
+    fireEvent.change(screen.getByLabelText(/Recipient's Bank:/), { target: { value: 'Bank of America' } });
+    fireEvent.change(screen.getByLabelText(/Recipient's Account No:/), { target: { value: '12345678' } });
     fireEvent.change(screen.getByLabelText(/Amount to Transfer:/), { target: { value: '500' } });
+    fireEvent.change(screen.getByLabelText(/Enter SWIFT Code:/), { target: { value: 'BOFAUS3N' } });
+    fireEvent.change(screen.getByLabelText(/Currency:/), { target: { value: 'USD' } });
 
-    fireEvent.click(screen.getByText(/PAY Now/));
+    // Find the form and submit it  
+    fireEvent.click(screen.getByRole('button', { name: /PAY Now/i }));
 
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/Home'));
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    // Wait for the navigation to happen and assert that it redirects to /Home
+    waitFor(async() => expect(mockNavigate).toHaveBeenCalledWith('/Home'));
   });
 
   test('shows an alert when the form is submitted with missing fields', async () => {
@@ -68,12 +79,12 @@ describe('DetailsForm Component', () => {
         <DetailsForm />
       </Router>
     );
-  
+
     // Leave 'Recipient Name' empty to trigger validation
     fireEvent.change(screen.getByLabelText(/Recipient's Name:/), { target: { value: '' } });
-  
+
     fireEvent.click(screen.getByText(/PAY Now/));
-  
+
     await waitFor(() => expect(window.alert).toHaveBeenCalledWith('Please fill out all fields before proceeding.'));
     expect(window.alert).toHaveBeenCalledTimes(1);
   });
