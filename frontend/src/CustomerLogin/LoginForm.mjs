@@ -3,39 +3,40 @@ import { useNavigate } from 'react-router-dom';
 import './LoginStyle.css';
 
 function LoginForm() {
+  const [username, setUsername] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       // Sends the login request to the backend
       const response = await fetch('https://localhost:3001/users/login', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ accountNumber: accountNumber, password: password }),
+        body: JSON.stringify({ username, accountNumber, password }),
       });
+
       const data = await response.json();
 
       if (response.ok) {
         // Stores the JWT token in local storage
         localStorage.setItem('jwt', data.token);
-       alert('Login successful!');
+        alert('Login successful!');
         
         // Navigates to the dashboard page after successful login
         navigate('/Home');
       } else {
-        console.log('12');
         // Displays an error message if login failed
-       alert('Login failed: ' + data.message);
+        alert('Login failed: ' + data.message);
       }
     } catch (error) {
-     console.error('Error:', error);
-     console.log('Error:', error);
-     alert('Login error: ' + error.message);
+      console.error('Error:', error);
+      alert('Login error: ' + error.message);
     }
   };
 
@@ -43,6 +44,16 @@ function LoginForm() {
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit}>
         <h2>Login Form</h2>
+
+        <label htmlFor="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
+          required
+        />
 
         <label htmlFor="account-number">Account Number</label>
         <input
