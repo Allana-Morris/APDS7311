@@ -16,12 +16,12 @@ function Dashboard() {
           'Authorization': `Bearer ${token}`,
         }
       })
-      .then(response => response.json())
-      .then(data => {
-        setUser(data.user);
-        setTransactions(data.transactions || []);
-      })
-      .catch(err => console.error('Error fetching user data:', err));
+        .then(response => response.json())
+        .then(data => {
+          setUser(data.user);
+          setTransactions(data.transactions || []);
+        })
+        .catch(err => console.error('Error fetching user data:', err));
     }
   }, []);
 
@@ -64,44 +64,39 @@ function Dashboard() {
         </div>
 
         <div className="banking-details">
-          <h3 style={{ textAlign: 'center' }}>Banking Details</h3>
-          <table className="banking-table">
-            <tbody>
-              <tr><br /></tr>
-              <tr>
-                <td width={"10%"}></td>
-                <td style={{ fontWeight: 'bolder' }}>Current Acc</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td width={"10%"}></td>
-                <td style={{ fontWeight: 'bold' }}>Acc No:</td>
-                <td></td>
-                <td style={{ fontWeight: 'bold' }}>Available Bal:</td>
-              </tr>
-              <tr>
-                <td width={"10%"}></td>
-                <td>{user.accountNumber}</td>
-                <td></td>
-                <td>{`R${user.balance ? user.balance.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',') : '0,00'}`}</td>
-              </tr>
-              <tr><br /></tr>
-            </tbody>
-          </table>
-        </div>
+  <h3 className="banking-title">Banking Details</h3>
+  <table className="banking-table">
+    <thead>
+      <tr>
+        <th className="banking-heading"></th> {/* Empty header */}
+        <th className="banking-heading">Current Acc</th>
+        <th className="banking-heading">Acc No</th>
+        <th className="banking-heading">Available Bal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td className="empty-cell"></td> {/* Empty cell to match the header */}
+        <td></td>
+        <td>{user.accountNumber}</td>
+        <td>{`R${user.balance ? user.balance.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',') : '0,00'}`}</td>
+      </tr>
+      <tr><td colSpan="4"></td></tr> {/* Empty row */}
+    </tbody>
+  </table>
+</div>
 
         <h3>Payment Receipts</h3>
-        <div className="payment-receipts" style={{ textAlign: 'center', overflowY: 'auto', maxHeight: '300px' }}>
-          <table className="receipts-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="payment-receipts">
+          <table className="receipts-table">
             <thead>
               <tr>
-                <th style={{ width: '15%' }}>Date</th>
-                <th style={{ width: '15%' }}>Payer</th>
-                <th style={{ width: '15%' }}>Recipient</th>
-                <th style={{ width: '15%' }}>Amount</th>
-                <th style={{ width: '15%' }}>Status</th> {/* New Pending Column */}
-                <th style={{ width: '25%' }}>Action</th>
+                <th>Date</th>
+                <th>Payer</th>
+                <th>Recipient</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -111,16 +106,15 @@ function Dashboard() {
                   const amount = parseFloat(transaction.amount);
                   const displayAmount = isPayer
                     ? `R${amount.toLocaleString('en-ZA', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).replace(/,/g, ' ').replace('.', ',')}`
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).replace(/,/g, ' ').replace('.', ',')}`
                     : `+ R${amount.toLocaleString('en-ZA', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).replace(/,/g, ' ').replace('.', ',')}`;
-
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).replace(/,/g, ' ').replace('.', ',')}`;
                   const amountStyle = isPayer ? { color: 'red' } : { color: 'green' };
-                  const isPending = !transaction.approved; // Check if pending
+                  const isPending = !transaction.approved;
 
                   return (
                     <tr key={index}>
@@ -128,7 +122,7 @@ function Dashboard() {
                       <td>{isPayer ? `${user.firstName} ${user.lastName}` : transaction.sender}</td>
                       <td>{transaction.recipient.name}</td>
                       <td style={amountStyle}>{displayAmount}</td>
-                      <td>{isPending ? 'Pending' : 'Approved'}</td> {/* Pending column */}
+                      <td>{isPending ? 'Pending' : 'Approved'}</td>
                       <td>
                         {isPayer && (
                           <button
@@ -150,7 +144,6 @@ function Dashboard() {
             </tbody>
           </table>
         </div>
-        <br />
       </div>
     </div>
   );
