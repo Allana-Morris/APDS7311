@@ -56,6 +56,7 @@ const RegistrationForm = () => {
 
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
+      console.log('Error state:', 'Passwords do not match.'); // Log the error message
       return;
     }
 

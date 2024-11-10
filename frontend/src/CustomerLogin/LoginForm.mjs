@@ -9,21 +9,18 @@ function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('cat');
     try {
       // Sends the login request to the backend
-      const response = await fetch('http://localhost:3001/users/Login', {
+      const response = await fetch('https://localhost:3001/users/login', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ accountNumber: accountNumber, password: password }),
       });
-      console.log('dog');
       const data = await response.json();
 
       if (response.ok) {
-        console.log('bird');
         // Stores the JWT token in local storage
         localStorage.setItem('jwt', data.token);
        alert('Login successful!');
