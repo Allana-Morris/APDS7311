@@ -1,6 +1,6 @@
 const request = require('supertest');
 const express = require('express');
-const userrouter = require('../routes/userroutes'); // Import your Express router here
+const userrouter = require('../routes/userroutes.mjs'); // Import your Express router here
 const app = express();
 const db = require('../db/conn'); // Mock the DB connection if needed
 const bcrypt = require('bcrypt');

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import './RegisterStyles.css';
+import './RegisterStyles.css'; // Import the CSS file
 
 const RegistrationForm = () => {
   const [firstName, setFirstName] = useState('');
@@ -25,16 +25,11 @@ const RegistrationForm = () => {
   const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/; // Password validation
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevents the default form submission
 
     // Input validation
     if (!namePattern.test(firstName) || !namePattern.test(lastName)) {
       setError('Invalid name. Only letters, spaces, and hyphens are allowed.');
-      return;
-    }
-
-    if (!usernamePattern.test(userName)) {
-      setError('Invalid username. It should be 3-15 characters and can only include letters, numbers, underscores, and hyphens.');
       return;
     }
 
@@ -63,10 +58,9 @@ const RegistrationForm = () => {
       return;
     }
 
-    setError(null);
+    setError(null); // Clears any previous error
 
     try {
-      alert(userName)
       const response = await fetch('https://localhost:3001/users/', {
         method: 'POST',
         headers: {
@@ -75,7 +69,6 @@ const RegistrationForm = () => {
         body: JSON.stringify({
           firstName,
           lastName,
-          userName, // Add username to the POST request
           email,
           password,
           confirmPassword,
@@ -88,9 +81,9 @@ const RegistrationForm = () => {
 
       if (response.ok) {
         alert('Registration successful!');
+        //Clears inputs 
         setFirstName('');
         setLastName('');
-        setUsername(''); 
         setEmail('');
         setPassword('');
         setConfirmPassword('');
@@ -114,10 +107,10 @@ const RegistrationForm = () => {
         <meta name="description" content="Create a new account for Mars Portal." />
       </Helmet>
       <form className="registration-form" onSubmit={handleSubmit}>
-        <h2 className="customer-heading">Customer Registration</h2>
-        {error && <div className="error-message">{error}</div>}
+        <h2 className='customer-heading'>Customer Registration</h2>
+        {error && <div className="error-message">{error}</div>} {/* Displays the error messages */}
         <div className="form-fields">
-          <br />
+          <br></br>
           <div className="form-row">
             <input
               className="form-input"
@@ -140,16 +133,6 @@ const RegistrationForm = () => {
           <div className="form-row">
             <input
               className="form-input"
-              type="text"
-              placeholder="Username"
-              value={userName}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-row">
-            <input
-              className="form-input"
               type="email"
               placeholder="Email Address"
               value={email}
@@ -161,19 +144,21 @@ const RegistrationForm = () => {
             <input
               className="form-input"
               type="password"
-              placeholder="Password"
+              id="password" // This id should match the label's `for`
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
+              placeholder="Password"
             />
             <div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
             <input
               className="form-input"
               type="password"
-              placeholder="Confirm Password"
+              id="confirmPassword" // This id should match the label's `for`
+              name="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              required
+              placeholder="Confirm Password"
             />
           </div>
           <div className="form-row">
@@ -195,17 +180,20 @@ const RegistrationForm = () => {
               required
             />
             <div>
-              <br />
+              <br>
+              </br>
             </div>
           </div>
           <button className="submit-button" type="submit">Submit</button>
           <div>
-            <br />
+            <br>
+
+            </br>
           </div>
         </div>
         <div className="align-right">
           An existing customer?{' '}
-          <Link className="redirect-login" to="/Login">
+          <Link className="redirect-login" to="/Login"> {/*Redirects to Login if User already has an account*/}
             Click to Login
           </Link>
         </div>

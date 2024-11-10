@@ -1,4 +1,4 @@
-const checkAuth = require('../checkAuth');
+const checkAuth = require('../checkAuth.mjs');
 const jwt = require('jsonwebtoken');
 
 // Mock jwt.verify explicitly
