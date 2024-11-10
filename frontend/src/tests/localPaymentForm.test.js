@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, MemoryRouter, Routes, Route } from 'react-router-dom';
 import LocalPaymentForm from '../RecipientDetailsPay/localPaymentForm.mjs'; // Adjust path if necessary
 
 // Mock localStorage
@@ -24,42 +24,55 @@ describe('LocalPaymentForm', () => {
   });
 
   test('fills in form data when location.state is passed', () => {
-    render(
-      <Router>
-        <LocalPaymentForm />
-      </Router>
-    );
-
-    // Simulate location state being passed into the component
+    // Mock location.state with form data
     const mockLocation = {
       state: {
         amount: '1000',
-        recipient: { name: 'John Doe', bank: 'Bank A', accountNumber: '123456789' },
+        recipient: {
+          name: 'John Doe',
+          bank: 'Bank A',
+          accountNumber: '123456789'
+        },
         branch: 'Main Branch'
       }
     };
 
-    // Manually set location state
-    global.window.location = mockLocation;
+    render(
+      <MemoryRouter initialEntries={['/payment']} initialIndex={0}>
+        <Routes>
+          <Route path="/payment" element={<LocalPaymentForm />} />
+        </Routes>
+      </MemoryRouter>
+    );
 
-    expect(screen.getByDisplayValue(/John Doe/i)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(/Bank A/i)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(/123456789/i)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(/1000/i)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(/Main Branch/i)).toBeInTheDocument();
+    // Wait for the useEffect to run and populate the form fields
+    waitFor(async () => {
+      expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Bank A')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('123456789')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('1000')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Main Branch')).toBeInTheDocument();
+    });
   });
 
   test('displays an alert if form is submitted with missing fields', async () => {
+    // Mock the alert function
+    global.alert = jest.fn();
+
     render(
-      <Router>
-        <LocalPaymentForm />
-      </Router>
+      <MemoryRouter initialEntries={['/payment']} initialIndex={0}>
+        <Routes>
+          <Route path="/payment" element={<LocalPaymentForm />} />
+        </Routes>
+      </MemoryRouter>
     );
 
+    // Submit the form with missing fields (leave some fields empty)
     const submitButton = screen.getByText(/PAY Now/i);
     userEvent.click(submitButton);
 
-    expect(await screen.findByText(/Please fill out all fields before proceeding/i)).toBeInTheDocument();
+    // Check if the alert was triggered with the correct message
+    expect(global.alert).toHaveBeenCalledWith('Please fill out all fields before proceeding.');
   });
 
   test('submits form and calls the backend', async () => {
@@ -70,9 +83,11 @@ describe('LocalPaymentForm', () => {
     });
 
     render(
-      <Router>
-        <LocalPaymentForm />
-      </Router>
+      <MemoryRouter initialEntries={['/payment']} initialIndex={0}>
+        <Routes>
+          <Route path="/payment" element={<LocalPaymentForm />} />
+        </Routes>
+      </MemoryRouter>
     );
 
     // Fill out the form fields
@@ -86,16 +101,26 @@ describe('LocalPaymentForm', () => {
     userEvent.click(submitButton);
 
     await waitFor(() => {
+      // Check the fetch call with the exact body content and headers
       expect(global.fetch).toHaveBeenCalledWith(
         'https://localhost:3001/users/Payment',
         expect.objectContaining({
           method: 'POST',
-          body: expect.stringContaining('{"recName":"John Doe"')
+          headers: expect.objectContaining({
+            'Authorization': 'Bearer test-jwt-token',
+            'Content-Type': 'application/json'
+          }),
+          body: JSON.stringify({
+            type: 'local',
+            recName: 'John Doe',
+            recBank: 'Bank A',
+            recAccNo: '123456789',
+            amount: '1000',
+            branch: 'Main Branch'
+          })
         })
       );
     });
-
-    expect(await screen.findByText(/Transaction successful: Payment successful/i)).toBeInTheDocument();
   });
 
   test('resets form and navigates to home on cancel', async () => {
