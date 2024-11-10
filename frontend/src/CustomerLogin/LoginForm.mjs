@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './LoginStyle.css';
 
 function LoginForm() {
+  const [username, setUsername] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ function LoginForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ accountNumber, password }),
+        body: JSON.stringify({ username, accountNumber, password }),
       });
 
       const data = await response.json();
@@ -25,17 +26,17 @@ function LoginForm() {
       if (response.ok) {
         // Stores the JWT token in local storage
         localStorage.setItem('jwt', data.token);
-       alert('Login successful!');
+        alert('Login successful!');
         
         // Navigates to the dashboard page after successful login
         navigate('/Home');
       } else {
         // Displays an error message if login failed
-       alert('Login failed: ' + data.message);
+        alert('Login failed: ' + data.message);
       }
     } catch (error) {
       console.error('Error:', error);
-     alert('Login error: ' + error.message);
+      alert('Login error: ' + error.message);
     }
   };
 
@@ -44,13 +45,23 @@ function LoginForm() {
       <form className="login-form" onSubmit={handleSubmit}>
         <h2>Login Form</h2>
 
+        <label htmlFor="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
+          required
+        />
+
         <label htmlFor="account-number">Account Number</label>
         <input
           type="text"
           id="account-number"
           value={accountNumber}
           onChange={(e) => setAccountNumber(e.target.value)}
-          placeholder="Account Number or username"
+          placeholder="Account Number"
           required
         />
 
