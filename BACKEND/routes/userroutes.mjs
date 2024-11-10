@@ -569,9 +569,8 @@ router.post("/ProcessPay", checkAuth, async (req, res) => {
 });
 
 router.post("/rejectPay", checkAuth, async (req, res) => {
-    const sanitizedTransactionId = sanitize(req.body.transactionId || '');
+    const sanitizedTransactionId = validator.escape(req.body.transactionId || '');
 
-  console.log(transactionId);
     try {
         const result = await db.collection('Transactions').deleteOne({ transactionId: sanitizedTransactionId });
   

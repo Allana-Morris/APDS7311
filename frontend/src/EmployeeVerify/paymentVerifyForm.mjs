@@ -171,7 +171,7 @@ function PaymentVerifyForm() {
         });
 
         // Navigate to the home page
-        navigate('/home');
+        navigate('/employeeHome');
       } else {
         alert(`Error rejecting transaction: ${data.message}`);
       }
