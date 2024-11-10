@@ -28,10 +28,6 @@ function App() {
 
           <Route exact path="/EmployeeHome" element={< EmpDash />} />
           <Route exact path="/verifyPay" element={< Verify />} />
-
-
-
-
         </Routes>
       </BrowserRouter>
     </div>

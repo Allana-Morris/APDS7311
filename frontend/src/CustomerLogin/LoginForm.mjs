@@ -12,7 +12,7 @@ function LoginForm() {
 
     try {
       // Sends the login request to the backend
-      const response = await fetch('https://localhost:3001/users/login', {
+      const response = await fetch('https://localhost:3001/users/Login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
