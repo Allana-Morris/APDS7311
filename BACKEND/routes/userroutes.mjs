@@ -4,6 +4,8 @@ import db from "../db/conn.mjs";
 import jwt from "jsonwebtoken";
 import expressBrute from "express-brute"
 import checkAuth from '../checkAuth.mjs';
+import validator from 'validator';
+
 
 const router = express.Router();
 var store = new expressBrute.MemoryStore();
@@ -15,7 +17,7 @@ const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key'; //i dont thin
 
 // User registration route
 router.post('/', async (req, res) => {
-    const { firstName, lastName, email, password, confirmPassword, accountNumber, idNumber } = req.body;
+    const { firstName, lastName, userName ,email, password, confirmPassword, accountNumber, idNumber } = req.body;
 
     // Regular Expressions for Validation
     const namePattern = /^[a-zA-Z\s-]+$/; // Allows letters, spaces, and hyphens
@@ -25,8 +27,8 @@ router.post('/', async (req, res) => {
     const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/; // Password validation
     
     // Input validation function
-    const validateInput = (firstName, lastName, email, accountNumber, idNumber, password, confirmPassword) => {
-        if (!namePattern.test(firstName) || !namePattern.test(lastName)) {
+    const validateInput = (firstName, lastName,userName, email, accountNumber, idNumber, password, confirmPassword) => {
+        if (!namePattern.test(firstName) || !namePattern.test(lastName) || !namePattern.test(userName)) {
             return { valid: false, message: 'Invalid name. Only letters, spaces, and hyphens are allowed.' };
         }
     
@@ -49,23 +51,35 @@ router.post('/', async (req, res) => {
         if (password !== confirmPassword) {
             return { valid: false, message: 'Passwords do not match.' };
         }
-    
-        return { valid: true }; // All validations passed
+
+        return { valid: true };
+
+
     };
 
     try {
     // Usage of validateInput
-    const validationResult = validateInput(firstName, lastName, email, accountNumber, idNumber, password, confirmPassword);
+    const validationResult = validateInput(firstName, lastName, userName,email, accountNumber, idNumber, password, confirmPassword);
     if (!validationResult.valid) {
         return res.status(400).json({ message: validationResult.message });
     }
 
     
         // Check if user already exists
-        const existingUser = await db.collection('Users').findOne({ accountNumber });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User already exists.' });
-        }
+       // Check if the account number already exists
+    const existingAccountNumber = await db.collection('Users').findOne({ accountNumber });
+    if (existingAccountNumber) {
+        return res.status(400).json({ message: 'A user with this account number already exists.' });
+    }
+
+    // Check if the username already exists
+    const existingUsername = await db.collection('Users').findOne({ userName });
+    if (existingUsername) {
+       return res.status(400).json({ message: 'A user with this username already existss.' + userName});
+    }
+
+// Proceed with registration if both checks pass
+
 
         // Salt and hash the password
         const saltRounds = 10; // Number of salt rounds
@@ -77,6 +91,7 @@ router.post('/', async (req, res) => {
         const newUser = {
             firstName,
             lastName,
+            userName,
             email,
             password: hashedPassword, // Store hashed password
             accountNumber,
@@ -105,7 +120,12 @@ router.post('/', async (req, res) => {
         {
             //getting user from database using the credentials
             const collection = await db.collection("Users")
-            const user = await collection.findOne({accountNumber});
+            const user = await collection.findOne({
+                $or: [
+                    { accountNumber: accountNumber },
+                    { userName: accountNumber }
+                ]
+            });
 
             //user isnt real
             if (!user)
@@ -123,7 +143,7 @@ router.post('/', async (req, res) => {
             }
             //they do match
             else{
-                const token = jwt.sign({accountNumber: accountNumber}, jwtSecret, {expiresIn:"1h"})
+                const token = jwt.sign({accountNumber: user.accountNumber}, jwtSecret, {expiresIn:"1h"})
                 res.status(200).json({message: "Successful login", token: token, name: req.body.name});
             }
         }
@@ -337,9 +357,10 @@ router.post('/', async (req, res) => {
     router.post("/employeeLogin", bruteforce.prevent, async (req, res) => 
         {
         const { username, password } = req.body;
+        
     
         // Input validation
-        if (!username || !password) {
+        if (!username || !password) {v
             return res.status(400).json({ message: "Username and password are required." });
         }
 
@@ -361,7 +382,7 @@ router.post('/', async (req, res) => {
             if (!passwordMatch) {
                 //const saltRounds = 10; // Number of salt rounds
                 //const hashedPassword = await bcrypt.hash(password, saltRounds);
-                return res.status(401).json({ message: "Incorrect password" + hashedPassword });
+                return res.status(401).json({ message: "Incorrect password"});
             }
     
             // Generate JWT with employee username
@@ -423,10 +444,14 @@ router.post('/', async (req, res) => {
             const sanitizedQuery = {
                 recipientName: validator.escape(req.query.recipientName || ''),
                 recipientBank: validator.escape(req.query.recipientBank || ''),
-                accountNumber: sanitize(req.query.accountNumber || ''),
+                accountNumber: req.query.accountNumber.replace(/\D/g, ''),  // Remove all non-digit characters
                 swiftCode: validator.escape(req.query.swiftCode || ''),
-                field: validator.escape(req.query.field || '')
+                field: validator.escape(req.query.field || ''),
+                amount : validator.escape(req.query.transactionAmount || ''),
+                sender: validator.escape(req.query.sender || '')
+
             };
+            
             
             // Check for missing fields and respond with an error if any are missing
             if (!sanitizedQuery.field) {
@@ -434,7 +459,7 @@ router.post('/', async (req, res) => {
             }
 
             // Query the internationalUsers collection to find the user with the given account number
-            const user = await db.collection("internationalUsers").findOne({ accountNumbe: sanitizedQuery.accountNumber });
+            const user = await db.collection("internationalUsers").findOne({ accountNumber: sanitizedQuery.accountNumber });
     
             // If the user does not exist, return an error message
             if (!user) {
@@ -464,6 +489,13 @@ router.post('/', async (req, res) => {
                 case "swiftCode":
                     if (user.swiftCode !== sanitizedQuery.swiftCode) {
                         return res.status(400).json({ message: "Swift code does not match." });
+                    }
+                    break;
+
+                case "transactionAmount":
+                    const sender = db.collection("Users").findOne({accountNumber : sanitizedQuery.sender})
+                    if ((sender.balance -sanitizedQuery.amount) < 0) {
+                        return res.status(400).json({ message: "Insufficient funds from sender" });
                     }
                     break;
     
