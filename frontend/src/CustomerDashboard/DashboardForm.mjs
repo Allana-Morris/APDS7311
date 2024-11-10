@@ -18,10 +18,10 @@ function Dashboard() {
       })
       .then(response => response.json())
       .then(data => {
-        setUser(data.user); //set the current user to the User signed in from response
-        setTransactions(data.transactions || []); // Sets transactions for the current user from response
+        setUser(data.user);
+        setTransactions(data.transactions || []);
       })
-      .catch(err => console.error('Error fetching user data:', err)); //Outputs error if if there is an error fetching from backend
+      .catch(err => console.error('Error fetching user data:', err));
     }
   }, []);
 
@@ -64,12 +64,10 @@ function Dashboard() {
         </div>
 
         <div className="banking-details">
-          <h3 style={{ textAlign: 'center' }}>Banking Details</h3> {/*Display for the Account Details*/}
+          <h3 style={{ textAlign: 'center' }}>Banking Details</h3>
           <table className="banking-table">
             <tbody>
-              <tr>
-                <br />
-              </tr>
+              <tr><br /></tr>
               <tr>
                 <td width={"10%"}></td>
                 <td style={{ fontWeight: 'bolder' }}>Current Acc</td>
@@ -86,24 +84,22 @@ function Dashboard() {
                 <td width={"10%"}></td>
                 <td>{user.accountNumber}</td>
                 <td></td>
-                <td>{`R${user.balance ? user.balance.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',') : '0,00'}`}</td> {/*Converts the Database number into a Currency String in ZAR*/}
+                <td>{`R${user.balance ? user.balance.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',') : '0,00'}`}</td>
               </tr>
-              <tr>
-                <br />
-              </tr>
+              <tr><br /></tr>
             </tbody>
           </table>
         </div>
 
-<h3>Payment Receipts</h3>
-        <div className="payment-receipts" style={{ textAlign: 'center', overflowY: 'auto', maxHeight: '300px' }}> {/*Display for Payment Receipts*/}
+        <h3>Payment Receipts</h3>
+        <div className="payment-receipts" style={{ textAlign: 'center', overflowY: 'auto', maxHeight: '300px' }}>
           <table className="receipts-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
-                <th style={{width: '20%'}} >Date</th>
-                <th style={{width: '20%'}} >Payer</th>
-                <th style={{width: '20%'}} >Recipient</th>
-                <th style={{width: '20%'}} >Amount</th>
+                <th style={{ width: '20%' }}>Date</th>
+                <th style={{ width: '20%' }}>Payer</th>
+                <th style={{ width: '20%' }}>Recipient</th>
+                <th style={{ width: '20%' }}>Amount</th>
                 <th></th>
               </tr>
             </thead>
@@ -112,33 +108,51 @@ function Dashboard() {
                 transactions.map((transaction, index) => {
                   const isPayer = transaction.sender === user.accountNumber;
                   const amount = parseFloat(transaction.amount);
-                  const displayAmount = isPayer ? `- R${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',')}` 
-                                                  : `+ R${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',')}`;
-                  
-                  const amountStyle = isPayer ? { color: 'red' } : { color: 'green' }; // Conditional styling for amount
+                  const displayAmount = isPayer
+                    ? `R${amount.toLocaleString('en-ZA', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).replace(/,/g, ' ').replace('.', ',')}`
+                    : `+ R${amount.toLocaleString('en-ZA', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).replace(/,/g, ' ').replace('.', ',')}`;
+
+                  const amountStyle = isPayer ? { color: 'red' } : { color: 'green' };
 
                   return (
                     <tr key={index}>
-                      <td>{new Date(transaction.date).toLocaleDateString()}</td> {/* Formats date */}
-                      <td>{isPayer ? user.firstName + ' ' + user.lastName : transaction.sender}</td> {/* Shows payer's name */}
-                      <td>{transaction.recipient.name}</td> {/* Accesses recipient's name */}
-                      <td style={amountStyle}>{displayAmount}</td> {/* Applies conditional styles */}
+                      <td>{new Date(transaction.date).toLocaleDateString()}</td>
+                      <td>{isPayer ? `${user.firstName} ${user.lastName}` : transaction.sender}</td>
+                      <td>{transaction.recipient.name}</td>
+                      <td>
+                        <div style={amountStyle}>{displayAmount}</div>
+                        {!transaction.approved && (
+                          <div style={{ color: 'blue', fontWeight: 'bold' }}>Pending</div>
+                        )}
+                      </td>
                       <td>
                         {isPayer && (
-                          <button className="pay-again-button" onClick={() => handlePayAgain(transaction)}>Pay again</button> )} {/*Pay Again Button*/}
+                          <button
+                            className="pay-again-button"
+                            onClick={() => handlePayAgain(transaction)}
+                          >
+                            Pay again
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center' }}>No transactions found.</td> {/*Message that displays if there are no transaction done by the User*/}
+                  <td colSpan="5" style={{ textAlign: 'center' }}>No transactions found.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        <br></br>
+        <br />
       </div>
     </div>
   );
