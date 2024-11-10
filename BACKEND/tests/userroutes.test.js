@@ -12,21 +12,21 @@ app.use('/api', userrouter);
 
 describe('User Registration and Login Tests', () => {
     describe('POST /api/', () => {
-       /* it('should register a new user successfully', async() => {
-            const response =  request(app)
-                .post('/api')
-                .send({
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    email: 'johndoe@example.com',
-                    password: 'ValidPassword123!',
-                    confirmPassword: 'ValidPassword123!',
-                    accountNumber: '123456789',
-                    idNumber: '8901234567890'
-                });
-                expect(response.status).toBe(201);
-                    expect(response.body.message).toBe('User registered successfully!');
-        }); */
+        /* it('should register a new user successfully', async() => {
+             const response =  request(app)
+                 .post('/api')
+                 .send({
+                     firstName: 'John',
+                     lastName: 'Doe',
+                     email: 'johndoe@example.com',
+                     password: 'ValidPassword123!',
+                     confirmPassword: 'ValidPassword123!',
+                     accountNumber: '123456789',
+                     idNumber: '8901234567890'
+                 });
+                 expect(response.status).toBe(201);
+                     expect(response.body.message).toBe('User registered successfully!');
+         }); */
 
         it('should return an error when user already exists', async () => {
             db.collection = jest.fn().mockReturnValue({
@@ -45,7 +45,7 @@ describe('User Registration and Login Tests', () => {
                 });
 
             expect(response.status).toBe(400);
-            expect(response.body.message).toBe('User already exists.');
+            expect(response.body.message).toBe('A user with this account number already exists.');
         });
 
         it('should return an error for invalid input', async () => {

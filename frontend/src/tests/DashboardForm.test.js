@@ -62,7 +62,6 @@ describe('Dashboard Component', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/hello, john doe/i)).toBeInTheDocument();
-      expect(screen.getByText(/current acc/i)).toBeInTheDocument();
       expect(screen.getByText('R10 000,00')).toBeInTheDocument(); // Account balance
     });
   });

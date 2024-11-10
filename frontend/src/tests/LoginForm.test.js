@@ -1,4 +1,3 @@
-// LoginForm.test.mjs
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -32,6 +31,7 @@ describe('LoginForm Component', () => {
     expect(screen.getByText(/login form/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/account number/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toBeInTheDocument(); // Check for the username field
     expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument();
   });
 
@@ -42,12 +42,15 @@ describe('LoginForm Component', () => {
       </MemoryRouter>
     );
 
+    const usernameInput = screen.getByLabelText(/username/i);
     const accountNumberInput = screen.getByLabelText(/account number/i);
     const passwordInput = screen.getByLabelText(/password/i);
 
+    fireEvent.change(usernameInput, { target: { value: 'john_doe' } });
     fireEvent.change(accountNumberInput, { target: { value: '123456789' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
+    expect(usernameInput.value).toBe('john_doe');
     expect(accountNumberInput.value).toBe('123456789');
     expect(passwordInput.value).toBe('password123');
   });
@@ -66,10 +69,12 @@ describe('LoginForm Component', () => {
       </MemoryRouter>
     );
 
+    const usernameInput = screen.getByLabelText(/username/i);
     const accountNumberInput = screen.getByLabelText(/account number/i);
     const passwordInput = screen.getByLabelText(/password/i);
     const loginButton = screen.getByRole('button', { name: /log in/i });
 
+    fireEvent.change(usernameInput, { target: { value: 'john_doe' } });
     fireEvent.change(accountNumberInput, { target: { value: '123456789' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(loginButton);
@@ -78,7 +83,11 @@ describe('LoginForm Component', () => {
       expect(global.fetch).toHaveBeenCalledWith('https://localhost:3001/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accountNumber: '123456789', password: 'password123' }),
+        body: JSON.stringify({
+          username: 'john_doe', // Ensure the username is included in the body
+          accountNumber: '123456789',
+          password: 'password123',
+        }),
       });
       expect(localStorage.getItem('jwt')).toBe('mock-token');
       expect(mockNavigate).toHaveBeenCalledWith('/Home');
@@ -101,10 +110,12 @@ describe('LoginForm Component', () => {
       </MemoryRouter>
     );
 
+    const usernameInput = screen.getByLabelText(/username/i);
     const accountNumberInput = screen.getByLabelText(/account number/i);
     const passwordInput = screen.getByLabelText(/password/i);
     const loginButton = screen.getByRole('button', { name: /log in/i });
 
+    fireEvent.change(usernameInput, { target: { value: 'wrong_user' } });
     fireEvent.change(accountNumberInput, { target: { value: 'wrongAccount' } });
     fireEvent.change(passwordInput, { target: { value: 'wrongPassword' } });
     fireEvent.click(loginButton);
@@ -113,7 +124,11 @@ describe('LoginForm Component', () => {
       expect(global.fetch).toHaveBeenCalledWith('https://localhost:3001/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accountNumber: 'wrongAccount', password: 'wrongPassword' }),
+        body: JSON.stringify({
+          username: 'wrong_user', // Ensure the username is included in the body
+          accountNumber: 'wrongAccount',
+          password: 'wrongPassword',
+        }),
       });
       expect(window.alert).toHaveBeenCalledWith('Login failed: Invalid account number or password');
       expect(mockNavigate).not.toHaveBeenCalled();
