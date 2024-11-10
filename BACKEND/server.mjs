@@ -1,22 +1,22 @@
 import express from "express";
 import https from "https";
 import fs from "fs";
-import posts from "./routes/post.mjs"
-import userstuff from "./routes/userroutes.js"
+import posts from "./routes/post.mjs";
+import userstuff from "./routes/userroutes.js";
 import helmet from "helmet";
-import cors from "cors"
+import cors from "cors";
+import { connectToDatabase, db } from './db/conn.js';
 
-//seting port and express
 const PORT = 3001;
 const app = express();
 
-//setting ssl
+// Setting SSL options
 const options = {
     key: fs.readFileSync('keys/privatekey.pem'),
     cert: fs.readFileSync('keys/certificate.pem')
-}
+};
 
-//applying helmet
+// Applying security headers with helmet and custom headers
 app.use(helmet());
 app.use((req, res, next) => {
     //set security policy
@@ -42,31 +42,35 @@ app.use((req, res, next) => {
   
     //start the next middleware
     next();
-  });
+});
 
-  //setting cors aand express
-app.use(cors())
+// Setting up CORS and JSON parsing middleware
+app.use(cors());
 app.use(express.json());
 
-//cors settings
-app.use((reg, res, next) => {
+// CORS settings
+app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
     next();
-})
-
-//setting our routes
-app.use("/post", posts);
-app.route("/post", posts)
-
-app.use("/users", userstuff);
-app.route("/users", userstuff);
-
-//creating the server with all app options
-let server = https.createServer(options, app)
-
-//set the server to listen on our port
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
 });
+
+// Setting up routes
+app.use("/post", posts);
+app.use("/users", userstuff);
+
+// Create the server and start it after connecting to the database
+async function startServer() {
+    try {
+        await connectToDatabase();  // Wait for DB connection before starting the server
+        let server = https.createServer(options, app);
+        server.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("Failed to connect to the database. Server not started.", error);
+    }
+}
+
+startServer(); // Start the server
