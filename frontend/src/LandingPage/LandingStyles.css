@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+}
+
+.landing-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #54A09B; /* Primary color */
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+}
+
+.landing-subtitle {
+  font-size: 2rem;
+  margin-bottom: 3rem;
+  color: #333333;
+}
+
+.role-selection {
+  display: flex;
+  gap: 3rem;
+}
+
+.role-box {
+  padding: 2rem 3rem;
+  border: 3px solid #54A09B; /* Primary color */
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  color: #54A09B;
+}
+
+.role-box:hover {
+  background-color: #54A09B; /* Primary color on hover */
+  color: #ffffff;
+  transform: scale(1.05);
+}

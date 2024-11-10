@@ -8,6 +8,7 @@ import LocalPayment from "./RecipientDetailsPay/localPaymentForm.mjs"
 import EmpLog from "./EmployeeLogin/EmpLoginForm.mjs"
 import EmpDash from "./EmployeeDashBoard/EmpDashboardForm.mjs"
 import Verify from "./EmployeeVerify/paymentVerifyForm.mjs"
+import Landing from "./LandingPage/LandingPageForm.mjs"
 
 import { Route, Routes, BrowserRouter } from "react-router-dom";  // Import BrowserRouter and Route
 
@@ -28,6 +29,8 @@ function App() {
 
           <Route exact path="/EmployeeHome" element={< EmpDash />} />
           <Route exact path="/verifyPay" element={< Verify />} />
+          <Route exact path="/" element={< Landing />} />
+
 
 
 
