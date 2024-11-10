@@ -1,111 +1,124 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import DetailsForm from '../RecipientDetailsPay/DetailsForm.mjs';
+import { BrowserRouter as Router } from 'react-router-dom';
+
+// Mocks for useNavigate and useLocation
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: jest.fn(),
+  useLocation: jest.fn(),
+}));
 
 describe('DetailsForm Component', () => {
-  
-  const mockLocation = {
-    state: {
-      amount: '1000',
-      recipient: {
-        name: 'John Doe',
-        bank: 'Bank A',
-        accountNumber: '123456789'
+  let mockNavigate;
+  let mockLocation;
+
+  beforeEach(() => {
+    mockNavigate = jest.fn();
+    mockLocation = {
+      state: {
+        recipient: { name: 'John Doe', bank: 'Bank of America', accountNumber: '12345678' },
+        amount: '1000',
+        swift: 'BOFAUS3N',
+        currency: 'USD',
       },
-      swift: 'SWIFT123',
-      currency: 'USD'
-    }
-  };
+    };
 
-  // Test case for form render and autofill using location.state
-  test('fills in form data when location.state is passed', async () => {
-    render(
-      <MemoryRouter initialEntries={['/payment']} initialIndex={0}>
-        <Routes>
-          <Route path="/payment" element={<DetailsForm />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    // Check if the form is pre-filled with values from location.state
-    expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Bank A')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('123456789')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('1000')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('SWIFT123')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('USD')).toBeInTheDocument();
+    // Mocking useNavigate and useLocation hooks
+    require('react-router-dom').useNavigate.mockReturnValue(mockNavigate);
+    require('react-router-dom').useLocation.mockReturnValue(mockLocation);
   });
 
-  // Test case for form submission with valid input data
-  test('submits form with valid data', async () => {
-    // Mock the localStorage token
-    localStorage.setItem('jwt', 'test-jwt-token');
-
+  test('renders form fields with data from location.state', () => {
     render(
-      <MemoryRouter initialEntries={['/payment']} initialIndex={0}>
-        <Routes>
-          <Route path="/payment" element={<DetailsForm />} />
-        </Routes>
-      </MemoryRouter>
+      <Router>
+        <DetailsForm />
+      </Router>
     );
 
-    // Fill out the form
-    fireEvent.change(screen.getByLabelText(/Recipient's Name:/), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByLabelText(/Recipient's Bank:/), { target: { value: 'Bank A' } });
-    fireEvent.change(screen.getByLabelText(/Recipient's Account No:/), { target: { value: '123456789' } });
+    expect(screen.getByLabelText(/Recipient's Name:/)).toHaveValue('John Doe');
+    expect(screen.getByLabelText(/Recipient's Bank:/)).toHaveValue('Bank of America');
+    expect(screen.getByLabelText(/Recipient's Account No:/)).toHaveValue('12345678');
+    expect(screen.getByLabelText(/Amount to Transfer:/)).toHaveValue(1000);
+    expect(screen.getByLabelText(/Enter SWIFT Code:/)).toHaveValue('BOFAUS3N');
+    expect(screen.getByLabelText(/Currency:/)).toHaveValue('USD');
+  });
+
+  test('fills out the form and submits successfully', async () => {
+    render(
+      <Router>
+        <DetailsForm />
+      </Router>
+    );
+
+    fireEvent.change(screen.getByLabelText(/Recipient's Name:/), { target: { value: 'Alice Smith' } });
+    fireEvent.change(screen.getByLabelText(/Amount to Transfer:/), { target: { value: '500' } });
+
+    fireEvent.click(screen.getByText(/PAY Now/));
+
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/Home'));
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+  });
+
+  test('shows an alert when the form is submitted with missing fields', async () => {
+    window.alert = jest.fn();
+
+    render(
+      <Router>
+        <DetailsForm />
+      </Router>
+    );
+  
+    // Leave 'Recipient Name' empty to trigger validation
+    fireEvent.change(screen.getByLabelText(/Recipient's Name:/), { target: { value: '' } });
+  
+    fireEvent.click(screen.getByText(/PAY Now/));
+  
+    await waitFor(() => expect(window.alert).toHaveBeenCalledWith('Please fill out all fields before proceeding.'));
+    expect(window.alert).toHaveBeenCalledTimes(1);
+  });
+
+  test('calls API and handles response correctly on form submit', async () => {
+    // Mock the fetch API response
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({ message: 'Transaction successful!' }),
+    });
+
+    render(
+      <Router>
+        <DetailsForm />
+      </Router>
+    );
+
+    fireEvent.change(screen.getByLabelText(/Recipient's Name:/), { target: { value: 'Alice Smith' } });
     fireEvent.change(screen.getByLabelText(/Amount to Transfer:/), { target: { value: '1000' } });
-    fireEvent.change(screen.getByLabelText(/Enter SWIFT Code:/), { target: { value: 'SWIFT123' } });
 
-    // Submit the form
-    fireEvent.click(screen.getByText('PAY Now'));
+    fireEvent.click(screen.getByText(/PAY Now/));
 
-    await waitFor(() => {
-      // Here you can check if the POST request was made to the correct URL
-      // Also, you can check if the alert for success is called (this requires a mock for `alert`).
-    });
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(
+      'https://localhost:3001/users/Payment',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+          'Authorization': expect.stringContaining('Bearer'),
+        }),
+        body: expect.stringContaining('Alice Smith'),
+      })
+    ));
+    expect(window.alert).toHaveBeenCalledWith('Transaction successful: Transaction successful!');
   });
 
-  // Test case for form validation (missing required fields)
-  test('shows alert when form is submitted with missing fields', async () => {
+  test('resets form when Cancel button is clicked', () => {
     render(
-      <MemoryRouter initialEntries={['/payment']} initialIndex={0}>
-        <Routes>
-          <Route path="/payment" element={<DetailsForm />} />
-        </Routes>
-      </MemoryRouter>
+      <Router>
+        <DetailsForm />
+      </Router>
     );
 
-    // Submit the form with empty fields
-    fireEvent.click(screen.getByText('PAY Now'));
+    fireEvent.click(screen.getByText(/Cancel/));
 
-    await waitFor(() => {
-      // Check for the alert message when fields are missing
-      expect(window.alert).toHaveBeenCalledWith('Please fill out all fields before proceeding.');
-    });
+    expect(mockNavigate).toHaveBeenCalledWith('/Home');
   });
-
-  // Test case for form reset functionality
-  test('resets the form when cancel is clicked', async () => {
-    render(
-      <MemoryRouter initialEntries={['/payment']} initialIndex={0}>
-        <Routes>
-          <Route path="/payment" element={<DetailsForm />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    // Simulate filling the form
-    fireEvent.change(screen.getByLabelText(/Recipient's Name:/), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByLabelText(/Recipient's Bank:/), { target: { value: 'Bank A' } });
-
-    // Cancel the form
-    fireEvent.click(screen.getByText('Cancel'));
-
-    await waitFor(() => {
-      // Check that the fields have been reset to their default values
-      expect(screen.getByDisplayValue('')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('USD')).toBeInTheDocument();
-    });
-  });
-
 });
