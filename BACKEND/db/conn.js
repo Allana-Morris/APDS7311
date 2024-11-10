@@ -1,5 +1,5 @@
-const { MongoClient } = require("mongodb");
-const dotenv = require("dotenv");
+import { MongoClient } from 'mongodb';
+import dotenv from 'dotenv';
 dotenv.config();
 
 // Connection string
@@ -13,7 +13,7 @@ let db;
 // Connect to MongoDB and assign `db` when the connection is successful
 const connectToDatabase = client.connect()
     .then((connection) => {
-      //  console.log("Connected to MongoDB");
+        //  console.log("Connected to MongoDB");
         db = connection.db("APDSPOE");
         return db;  // Return the db instance for immediate use in the promise chain if needed
     })
@@ -22,11 +22,8 @@ const connectToDatabase = client.connect()
         throw error;
     });
 
-// Export a function to get the database instance, `db`, once connected
-module.exports = async () => {
-    if (!db) {
-        // Wait for the connection to complete if `db` is not yet set
-        await connectToDatabase;
-    }
-    return db;
-};
+if (!db) {
+    // Wait for the connection to complete if `db` is not yet set
+    await connectToDatabase;
+}
+export default db;

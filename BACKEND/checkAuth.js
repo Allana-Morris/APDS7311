@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
 dotenv.config(); //load environment variables
 
@@ -18,4 +18,4 @@ const checkAuth = (req, res, next) => {
         });
     }
 };
-module.exports = checkAuth;
+export default checkAuth;

@@ -1,9 +1,9 @@
-const express = require('express');
-const bcrypt = require('bcrypt');
-const db = require('../db/conn');
-const jwt = require('jsonwebtoken');
-const expressBrute = require('express-brute');
-const checkAuth = require('../checkAuth');
+import express from 'express';
+import bcrypt from 'bcrypt';
+import db from '../db/conn.js';
+import jwt from 'jsonwebtoken';
+import expressBrute from 'express-brute';
+import checkAuth from '../checkAuth.js';
 
 const router = express.Router();
 const store = new expressBrute.MemoryStore();
@@ -101,9 +101,10 @@ router.post("/Login", bruteforce.prevent, async (req, res) => {
         // Getting user from database using the credentials
         const collection = await db.collection("Users");
         const user = await collection.findOne({ accountNumber });
-
+        console.log('cannot');
         // User isn't real
         if (!user) {
+            console.log('can not');
             return res.status(401).json({ message: "User with account number not found" });
         }
 
@@ -120,6 +121,7 @@ router.post("/Login", bruteforce.prevent, async (req, res) => {
             res.status(200).json({ message: "Successful login", token: token, name: req.body.name });
         }
     } catch (error) {
+        console.log('uh oh');
         console.error("Login error:", error);
         res.status(500).json({ message: "Login error" });
     }
@@ -240,4 +242,4 @@ router.post("/payment", checkAuth, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

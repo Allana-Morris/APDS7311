@@ -2,7 +2,7 @@ import express from "express";
 import https from "https";
 import fs from "fs";
 import posts from "./routes/post.mjs"
-import userstuff from "./routes/userroutes.mjs"
+import userstuff from "./routes/userroutes.js"
 import helmet from "helmet";
 import cors from "cors"
 
@@ -61,6 +61,7 @@ app.use("/post", posts);
 app.route("/post", posts)
 
 app.use("/users", userstuff);
+app.route("/users", userstuff);
 
 //creating the server with all app options
 let server = https.createServer(options, app)

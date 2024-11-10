@@ -9,20 +9,21 @@ function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log('cat');
     try {
       // Sends the login request to the backend
-      const response = await fetch('https://localhost:3001/users/login', {
+      const response = await fetch('http://localhost:3001/users/Login', {
         method: 'POST',
-        headers: {
+        headers: { 
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ accountNumber, password }),
+        body: JSON.stringify({ accountNumber: accountNumber, password: password }),
       });
-
+      console.log('dog');
       const data = await response.json();
 
       if (response.ok) {
+        console.log('bird');
         // Stores the JWT token in local storage
         localStorage.setItem('jwt', data.token);
        alert('Login successful!');
@@ -30,11 +31,13 @@ function LoginForm() {
         // Navigates to the dashboard page after successful login
         navigate('/Home');
       } else {
+        console.log('12');
         // Displays an error message if login failed
        alert('Login failed: ' + data.message);
       }
     } catch (error) {
-      console.error('Error:', error);
+     console.error('Error:', error);
+     console.log('Error:', error);
      alert('Login error: ' + error.message);
     }
   };
