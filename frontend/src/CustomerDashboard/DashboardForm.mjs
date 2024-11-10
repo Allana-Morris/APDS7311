@@ -63,25 +63,27 @@ function Dashboard() {
           <button className="intl-payment" onClick={handleInternationalPaymentClick}>Make International Payment</button>
         </div>
 
-        <div className="banking-details">
-  <h3 className="banking-title">Banking Details</h3>
+        
+  <h3>Banking Details</h3>
+  <div className="banking-details">
   <table className="banking-table">
     <thead>
       <tr>
-        <th className="banking-heading"></th> {/* Empty header */}
-        <th className="banking-heading">Current Acc</th>
+        <th className="banking-heading"></th> 
         <th className="banking-heading">Acc No</th>
+        <th className="banking-heading"></th> 
         <th className="banking-heading">Available Bal</th>
+        <th className="banking-heading"></th> 
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td className="empty-cell"></td> {/* Empty cell to match the header */}
         <td></td>
         <td>{user.accountNumber}</td>
+        <td></td>
         <td>{`R${user.balance ? user.balance.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',') : '0,00'}`}</td>
+        <td></td>
       </tr>
-      <tr><td colSpan="4"></td></tr> {/* Empty row */}
     </tbody>
   </table>
 </div>
