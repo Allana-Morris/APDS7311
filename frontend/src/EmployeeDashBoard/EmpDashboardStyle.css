@@ -1,116 +1,125 @@
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center all items */
-  padding: 10px; /* Reduced padding */
-  border: 2px solid  #54A09B; /* Black border around the main container */
-  margin: 0 auto; /* Center the container */
-  min-width: 800px; /* Set a wide maximum width for the container */
+  align-items: center;
+  padding: 20px;
+  border: 2px solid #54A09B;
+  margin: 0 auto;
+  min-width: 800px;
   width: 100%;
-  background-color: #f9f9f9; /* Light background color */
+  background-color: #ffffff; /* Cleaner white background */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  border-radius: 10px; /* Rounded corners  */
   min-height: 800px;
-  max-height: 800px; /* Reduced maximum height for the container */
+  max-height: 800px;
 }
 
 .dashboard-title {
-  font-size: 1.8rem; /* Slightly smaller font size for the title */
-  margin-bottom: 8px; /* Reduced space below the title */
+  font-size: 2rem; /* large font */
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #333333; /* changed color to darker */
 }
 
 .welcome-message {
-  font-size: 1.4rem; /* Slightly smaller welcome message */
-  margin-bottom: 16px; /* Reduced space below the welcome message */
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: #666666; /* lighter than title*/
 }
 
 .dashboard-main {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers all items in the main dashboard */
+  align-items: center;
   width: 100%;
 }
 
 .banking-details {
-  width: 80%;
-  margin: 20px auto; /* Centers the table */
+  width: 85%; /* Made this wider */
+  margin: 20px auto;
   cursor: default;
 }
 
 .banking-table {
-  width: 100%; /* Makes the table fill the width of the container */
-  border-collapse: collapse; /* Collapse borders for table */
-  border: 1px solid  #888888; /* Black border around the entire table */
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #cccccc; /* lighter border color*/
 }
 
 .banking-table td {
-  padding: 10px; /* Padding for table cells */
-  text-align: start; /* Aligns text to the left */
+  padding: 12px;
+  text-align: left;
+  color: #444444; /* made text darker */
 }
 
 .banking-table td:nth-child(odd) {
-  background-color: #f9f9f9; /* Light background for odd cells */
+  background-color: #f2f2f2; /* subtle alt row colors */
 }
 
 .payment-receipts {
-  margin: 5px auto; /*Space above the payment receipts section */
-  width: 80%;
+  margin: 10px auto;
+  width: 85%;
   cursor: default;
 }
 
 .receipts-table {
-  width: 100%; 
+  width: 100%;
   border-collapse: collapse;
-  border: 1px solid  #888888; /* Black border around the entire table */
+  border: 1px solid #cccccc;
 }
 
 .receipts-table th,
 .receipts-table td {
-  padding: 8px; 
-  text-align: center; /* Center-aligns the text */
+  padding: 12px;
+  text-align: center;
+  color: #555555;
 }
 
 .receipts-table th {
-  width: 25%; /* Sets each header's width to one-quater of the table */
+  background-color: #e6f7f5; /* made header background color  */
+  font-weight: bold;
 }
 
 .pay-again-button {
-  padding: 10px 20px; /* Larger button size */
-  cursor: pointer; /* Pointer cursor on hover */
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #54A09B;
+  border: none;
+  color: white;
+  border-radius: 5px; /* Rounded button corners */
+  transition: background-color 0.3s ease; /*  hover effect */
 }
 
 .payment-buttons {
   display: flex;
-  justify-content: center; /* Centers the buttons */
-  margin-bottom: 16px; /* Reduced space below the buttons */
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .payment-buttons button {
-  padding: 12px 25px;
+  padding: 14px 28px;
   font-size: 1rem;
-  margin: 0 8px; /* Reduced space between buttons */
+  margin: 0 10px;
   background-color: #54A09B;
   border: none;
-    color: white;
-  cursor: pointer; /* Pointer on hover */
+  color: white;
+  border-radius: 5px;
+  transition: background-color 0.3s ease; /*  hover effect */
 }
 
-.payment-buttons button:hover{
-  background-color: #468681; /*Darker Button colour on hover*/
-  cursor: pointer;
-}
-
-.pay-again-button:hover{
-  background-color: #468681;  /*Darker Button colour on hover*/
-  cursor: pointer;
+.payment-buttons button:hover,
+.pay-again-button:hover {
+  background-color: #3e716d;
 }
 
 .form-group {
-  margin-bottom: 12px; /* Reduced space below each form group */
+  margin-bottom: 16px;
 }
 
 .form-input {
   padding: 8px;
   font-size: 0.9rem;
-  border: 1px solid #ccc; /* Light border for input fields */
+  border: 1px solid #ccc; /* Lighened the border for input fields */
   width: 100%;
 
 }

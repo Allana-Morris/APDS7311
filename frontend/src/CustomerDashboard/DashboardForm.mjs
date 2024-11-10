@@ -96,11 +96,12 @@ function Dashboard() {
           <table className="receipts-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
-                <th style={{ width: '20%' }}>Date</th>
-                <th style={{ width: '20%' }}>Payer</th>
-                <th style={{ width: '20%' }}>Recipient</th>
-                <th style={{ width: '20%' }}>Amount</th>
-                <th></th>
+                <th style={{ width: '15%' }}>Date</th>
+                <th style={{ width: '15%' }}>Payer</th>
+                <th style={{ width: '15%' }}>Recipient</th>
+                <th style={{ width: '15%' }}>Amount</th>
+                <th style={{ width: '15%' }}>Status</th> {/* New Pending Column */}
+                <th style={{ width: '25%' }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -108,15 +109,18 @@ function Dashboard() {
                 transactions.map((transaction, index) => {
                   const isPayer = transaction.sender === user.accountNumber;
                   const amount = parseFloat(transaction.amount);
-                  let displayAmount = isPayer ? `- R${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',')}` 
-                                              : `+ R${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ').replace('.', ',')}`;
-                  
-                  const amountStyle = isPayer ? { color: 'red' } : { color: 'green' };
+                  const displayAmount = isPayer
+                    ? `R${amount.toLocaleString('en-ZA', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).replace(/,/g, ' ').replace('.', ',')}`
+                    : `+ R${amount.toLocaleString('en-ZA', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).replace(/,/g, ' ').replace('.', ',')}`;
 
-                  // Prepend "Pending" if the transaction is not approved
-                  if (!transaction.approved) {
-                    displayAmount = `Pending ${displayAmount}`;
-                  }
+                  const amountStyle = isPayer ? { color: 'red' } : { color: 'green' };
+                  const isPending = !transaction.approved; // Check if pending
 
                   return (
                     <tr key={index}>
@@ -124,9 +128,15 @@ function Dashboard() {
                       <td>{isPayer ? `${user.firstName} ${user.lastName}` : transaction.sender}</td>
                       <td>{transaction.recipient.name}</td>
                       <td style={amountStyle}>{displayAmount}</td>
+                      <td>{isPending ? 'Pending' : 'Approved'}</td> {/* Pending column */}
                       <td>
                         {isPayer && (
-                          <button className="pay-again-button" onClick={() => handlePayAgain(transaction)}>Pay again</button>
+                          <button
+                            className="pay-again-button"
+                            onClick={() => handlePayAgain(transaction)}
+                          >
+                            Pay again
+                          </button>
                         )}
                       </td>
                     </tr>
@@ -134,7 +144,7 @@ function Dashboard() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center' }}>No transactions found.</td>
+                  <td colSpan="6" style={{ textAlign: 'center' }}>No transactions found.</td>
                 </tr>
               )}
             </tbody>

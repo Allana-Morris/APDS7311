@@ -2,48 +2,48 @@
   display: flex;
   flex-direction: column;
   align-items: center; /* Center all items */
-  padding: 10px; /* Reduced padding */
+  padding: 10px; 
   border: 2px solid  #54A09B; /* Black border around the main container */
   margin: 0 auto; /* Center the container */
   min-width: 800px; /* Set a wide maximum width for the container */
   width: 100%;
   background-color: #f9f9f9; /* Light background color */
   min-height: 800px;
-  max-height: 800px; /* Reduced maximum height for the container */
+  max-height: 800px; /* max height of container */
 }
 
 .dashboard-title {
-  font-size: 1.8rem; /* Slightly smaller font size for the title */
-  margin-bottom: 8px; /* Reduced space below the title */
+  font-size: 1.8rem; 
+  margin-bottom: 8px; 
 }
 
 .welcome-message {
-  font-size: 1.4rem; /* Slightly smaller welcome message */
-  margin-bottom: 16px; /* Reduced space below the welcome message */
+  font-size: 1.4rem; /* welcome message font size */
+  margin-bottom: 16px; /* space below message */
 }
 
 .dashboard-main {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers all items in the main dashboard */
+  align-items: center; /* Centers all items in dashboard */
   width: 100%;
 }
 
 .banking-details {
   width: 80%;
-  margin: 20px auto; /* Centers the table */
+  margin: 20px auto; /* Centers table */
   cursor: default;
 }
 
 .banking-table {
   width: 100%; /* Makes the table fill the width of the container */
-  border-collapse: collapse; /* Collapse borders for table */
-  border: 1px solid  #888888; /* Black border around the entire table */
+  border-collapse: collapse; 
+  border: 1px solid  #888888; /* Black border for table */
 }
 
 .banking-table td {
-  padding: 10px; /* Padding for table cells */
-  text-align: start; /* Aligns text to the left */
+  padding: 10px; 
+  text-align: start; /* Aligns text left */
 }
 
 .banking-table td:nth-child(odd) {
@@ -69,18 +69,18 @@
 }
 
 .receipts-table th {
-  width: 25%; /* Sets each header's width to one-quater of the table */
+  width: 25%; 
 }
 
 .pay-again-button {
-  padding: 10px 20px; /* Larger button size */
-  cursor: pointer; /* Pointer cursor on hover */
+  padding: 10px 20px; /* button size */
+  cursor: pointer; 
 }
 
 .payment-buttons {
   display: flex;
-  justify-content: center; /* Centers the buttons */
-  margin-bottom: 16px; /* Reduced space below the buttons */
+  justify-content: center; /* Centers buttons */
+  margin-bottom: 16px; /* Reduced space below buttons */
 }
 
 .payment-buttons button {
@@ -90,7 +90,7 @@
   background-color: #54A09B;
   border: none;
     color: white;
-  cursor: pointer; /* Pointer on hover */
+  cursor: pointer; 
 }
 
 .payment-buttons button:hover{
@@ -110,7 +110,7 @@
 .form-input {
   padding: 8px;
   font-size: 0.9rem;
-  border: 1px solid #ccc; /* Light border for input fields */
+  border: 1px solid #ccc; /*  input fields border colour */
   width: 100%;
 
 }
@@ -121,5 +121,27 @@
   background-color: #54A09B;
     color: white;
     border: none;
-  cursor: pointer; /* Pointer on hover */
+  cursor: pointer; 
+}
+.receipts-table td {
+  padding: 8px;
+  text-align: center;
+}
+
+.pending-column div {
+  font-weight: bold;
+  color: #888888; /* Blue for pending */
+}
+
+.pay-again-button {
+  padding: 10px 20px;
+  background-color: #54A09B;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pay-again-button:hover {
+  background-color: #468681;
 }
