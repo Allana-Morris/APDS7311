@@ -100,7 +100,7 @@ function DetailsForm() {
       currency: 'USD' // Resets currency to default
     });
 
-    navigate('/home'); // Redirects to /home when cancel is clicked
+    navigate('/Home'); // Redirects to /home when cancel is clicked
   };
 
   return (
