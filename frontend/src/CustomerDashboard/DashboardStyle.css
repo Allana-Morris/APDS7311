@@ -130,7 +130,7 @@
 
 .pending-column div {
   font-weight: bold;
-  color: blue; /* Blue for pending */
+  color: #888888; /* Blue for pending */
 }
 
 .pay-again-button {
