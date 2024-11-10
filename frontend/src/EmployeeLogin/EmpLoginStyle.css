@@ -8,8 +8,8 @@ LoginForm.css
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  font-family: 'Arial', sans-serif;
+  background-color: #eef2f3; 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,48 +17,79 @@ body {
 }
 
 .login-container {
-  border-radius: 25px;
-  padding: 20px;
-  width: 300px;
-  background-color: white;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  padding: 50px; 
+  width: 600px; /* Make form width larger */
+  background-color: #ffffff;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* making it look prettier :) */
   border: 2px solid #54A09B;
 }
 
 .login-form h2 {
   text-align: center;
-  padding: 5px;
-  margin-bottom: 20px;
-  color: #000000;
+  font-size: 2.5rem; /* "Employee Login" Title size */
+  margin-bottom: 35px; /* Adjust spacing */
+  color: #333333; /* label colour */
 }
 
 .login-form label {
   display: block;
-  margin-bottom: 8px;
-  color: #333;
+  margin-bottom: 12px;
+  font-size: 1.2rem; /* label font size */
+  color: #555555; /* softer color for contrast */
   font-weight: bold;
+  padding-left: 13px; /* align "username,Password" label with respective txtboxes */
+  padding-top: 30px; 
 }
 
 .login-form input {
-  width: 93%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  border: 1px solid #000000;
+  width: calc(100% - 55px); /* Ensures space between input and form border */
+  padding: 16px; /* Textbox sizes */
+  margin: 12px 10px; /* space between textboxes */
+  border-radius: 10px;
+  border: 1px solid #cccccc; /* border color  */
+  font-size: 1.2rem; /* hint text size */
+  background-color: #f9f9f9; /* Slightly off-white background for inputs */
+  transition: border-color 0.3s ease; 
+}
+
+.login-form input:focus {
+  border-color: #54A09B; /* brighten border color when mouse hover to add pazaz :) */
+  outline: none;
 }
 
 .login-form button {
-  width: 100%;
-  padding: 10px;
+  width: calc(100% - 20px); 
+  padding: 18px; /* btn size */
+  margin: 12px 10px; /* spacing */
   background-color: #54A09B;
   border: none;
-  color: white;
-  font-size: 16px;
-  border-radius: 5px;
+  color: #ffffff;
+  font-size: 1.5rem; /* Larger button text */
+  font-weight: bold;
+  border-radius: 10px; /* round corners of button to match rest of form*/
   cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 
 .login-form button:hover {
-  background-color: #468681;
+  background-color: #3e716d; /* Slightly darker hover effect */
 }
 
+.login-form button:active {
+  background-color: #33615a; /* Darker shade when used */
+}
+
+.login-form a {
+  display: block;
+  text-align: center;
+  margin-top: 25px; /* Increased margin for spacing */
+  font-size: 1.2rem; 
+  color: #54A09B;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.login-form a:hover {
+  color: #3e716d;
+}
