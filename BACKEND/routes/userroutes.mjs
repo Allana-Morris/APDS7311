@@ -113,7 +113,7 @@ router.post('/', async (req, res) => {
   router.post("/Login", bruteforce.prevent, async (req, res) =>
     {
         //getting the input
-        const {accountNumber, password} = req.body
+        const {username, accountNumber, password} = req.body
 
         //try to login
         try 
@@ -123,7 +123,6 @@ router.post('/', async (req, res) => {
             const user = await collection.findOne({
                 $or: [
                     { accountNumber: accountNumber },
-                    { userName: accountNumber }
                 ]
             });
 
@@ -132,6 +131,15 @@ router.post('/', async (req, res) => {
             {
                 return res.status(401).json({message: "User with account number not found"});
             }
+
+            if  (user.userName != username)
+            {
+                return res.status(401).json({message: "Incorrect username"});
+
+
+            }
+
+
 
             //check passwords matching
             const passwordMatch = await bcrypt.compare(password, user.password)
