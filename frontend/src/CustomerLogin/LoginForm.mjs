@@ -61,7 +61,7 @@ function LoginForm() {
           id="account-number"
           value={accountNumber}
           onChange={(e) => setAccountNumber(e.target.value)}
-          placeholder="Account Number"
+          placeholder="Account Number or Username"
           required
         />
 
