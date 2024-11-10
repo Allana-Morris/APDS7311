@@ -25,9 +25,9 @@ function LandingPageForm() {
         
         <div 
           className="role-box" 
-          onClick={() => handleRoleSelection('User')}
+          onClick={() => handleRoleSelection('Customer')}
         >
-          User
+          Customer
         </div>
       </div>
     </div>
