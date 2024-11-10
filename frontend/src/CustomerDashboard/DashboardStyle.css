@@ -1,140 +1,120 @@
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center all items */
-  padding: 10px; 
-  border: 2px solid  #54A09B; /* Black border around the main container */
-  margin: 0 auto; /* Center the container */
-  min-width: 800px; /* Set a wide maximum width for the container */
+  align-items: center;
+  padding: 10px;
+  border: 2px solid #54A09B;
+  margin: 0 auto;
+  min-width: 800px;
   width: 100%;
-  background-color: #f9f9f9; /* Light background color */
+  background-color: #f9f9f9;
   min-height: 800px;
-  max-height: 800px; /* max height of container */
+  max-height: 800px;
 }
 
 .dashboard-title {
-  font-size: 1.8rem; 
-  margin-bottom: 8px; 
+  font-size: 1.8rem;
+  margin-bottom: 8px;
 }
 
 .welcome-message {
-  font-size: 1.4rem; /* welcome message font size */
-  margin-bottom: 16px; /* space below message */
+  font-size: 1.4rem;
+  margin-bottom: 16px;
 }
 
 .dashboard-main {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers all items in dashboard */
+  align-items: center;
   width: 100%;
-}
-
-.banking-details {
-  width: 80%;
-  margin: 20px auto; /* Centers table */
-  cursor: default;
-}
-
-.banking-table {
-  width: 100%; /* Makes the table fill the width of the container */
-  border-collapse: collapse; 
-  border: 1px solid  #888888; /* Black border for table */
-}
-
-.banking-table td {
-  padding: 10px; 
-  text-align: start; /* Aligns text left */
-}
-
-.banking-table td:nth-child(odd) {
-  background-color: #f9f9f9; /* Light background for odd cells */
-}
-
-.payment-receipts {
-  margin: 5px auto; /*Space above the payment receipts section */
-  width: 80%;
-  cursor: default;
-}
-
-.receipts-table {
-  width: 100%; 
-  border-collapse: collapse;
-  border: 1px solid  #888888; /* Black border around the entire table */
-}
-
-.receipts-table th,
-.receipts-table td {
-  padding: 8px; 
-  text-align: center; /* Center-aligns the text */
-}
-
-.receipts-table th {
-  width: 25%; 
-}
-
-.pay-again-button {
-  padding: 10px 20px; /* button size */
-  cursor: pointer; 
 }
 
 .payment-buttons {
   display: flex;
-  justify-content: center; /* Centers buttons */
-  margin-bottom: 16px; /* Reduced space below buttons */
+  justify-content: center;
+  margin-bottom: 16px;
 }
 
 .payment-buttons button {
   padding: 12px 25px;
   font-size: 1rem;
-  margin: 0 8px; /* Reduced space between buttons */
+  margin: 0 8px;
   background-color: #54A09B;
   border: none;
-    color: white;
-  cursor: pointer; 
-}
-
-.payment-buttons button:hover{
-  background-color: #468681; /*Darker Button colour on hover*/
+  color: white;
   cursor: pointer;
 }
 
-.pay-again-button:hover{
-  background-color: #468681;  /*Darker Button colour on hover*/
-  cursor: pointer;
+.payment-buttons button:hover {
+  background-color: #468681;
 }
 
-.form-group {
-  margin-bottom: 12px; /* Reduced space below each form group */
+.banking-details {
+  width: 80%;
+  margin: 20px auto;
 }
 
-.form-input {
-  padding: 8px;
-  font-size: 0.9rem;
-  border: 1px solid #ccc; /*  input fields border colour */
+.banking-title {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.banking-table {
   width: 100%;
-
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-.pay-again-button {
-  padding: 8px 15px;
-  margin-top: 8px; /* Reduced space above button */
-  background-color: #54A09B;
-    color: white;
-    border: none;
-  cursor: pointer; 
+.banking-table th, .banking-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid white;
 }
-.receipts-table td {
+
+.banking-table th {
+  background-color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.banking-table td {
+  background-color: white; /* Keep <td> cells white */
+}
+
+.empty-cell {
+  background-color: white; /* Empty cell with no background */
+}
+
+.payment-receipts {
+  margin: 5px auto;
+  width: 80%;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.receipts-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #888888;
+}
+
+.receipts-table th, .receipts-table td {
   padding: 8px;
   text-align: center;
 }
 
-.pending-column div {
-  font-weight: bold;
-  color: #888888; /* Blue for pending */
+.amount-red {
+  color: red;
+  white-space: nowrap;
+}
+
+.amount-green {
+  color: green;
+  white-space: nowrap;
 }
 
 .pay-again-button {
-  padding: 10px 20px;
+  padding: 8px 15px;
   background-color: #54A09B;
   color: white;
   border: none;
