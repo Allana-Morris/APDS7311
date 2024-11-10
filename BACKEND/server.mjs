@@ -20,7 +20,7 @@ const options = {
 app.use(helmet());
 app.use((req, res, next) => {
     //set security policy
-    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none';");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none';");
   
     //set content x options
     res.setHeader('X-Content-Type-Options', 'nosniff'); // Prevents MIME type sniffing
