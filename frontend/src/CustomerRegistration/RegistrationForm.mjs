@@ -99,11 +99,11 @@ const RegistrationForm = () => {
         navigate('/Login');
       } else {
         const errorMessage = data.message || 'Registration failed. Please try again.';
-        alert('Registration failed: ' + errorMessage);
+        alert('Registration failed');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Registration error: ' + error.message);
+      alert('Registration error');
     }
   };
 
