@@ -173,8 +173,8 @@ router.post("/payment", checkAuth, async (req, res) => {
     const sanitizedBranch = validator.escape(branch);
     const sanitizedCurrency = validator.escape(currency);
 
-    // Ensure all fields are valid and sanitized
-    const sanitizedRecAccNo = parseInt(recAccNo, 10);  // Ensure recipient account number is a number
+    // Ensure recipient account number is a number
+    const sanitizedRecAccNo = parseInt(recAccNo, 10);
     if (isNaN(sanitizedRecAccNo)) {
         return res.status(400).json({ message: "Invalid recipient account number format." });
     }
@@ -233,6 +233,31 @@ router.post("/payment", checkAuth, async (req, res) => {
                     { $inc: { balance: transferAmount } },
                     { session }
                 );
+            } else if (type === "international") {
+                // Handle international payment logic (e.g., currency conversion or extra fees)
+                const exchangeRate = await getExchangeRate(sanitizedCurrency, sender.currency);  // Example of an external API call for conversion
+                const internationalFee = calculateInternationalFee(transferAmount);  // Assuming you have a fee structure
+
+                // Adjust the transfer amount for international fees and currency conversion
+                const adjustedAmount = transferAmount * exchangeRate + internationalFee;
+
+                // Update sender's balance (subtract the international fee)
+                if (sender.balance < adjustedAmount) {
+                    return res.status(400).json({ message: messages.insufficientFunds });
+                }
+
+                await db.collection('Users').updateOne(
+                    { accountNumber: senderAccountNumber },
+                    { $inc: { balance: -adjustedAmount } },
+                    { session }
+                );
+
+                // If the recipient is a valid international recipient, apply the adjusted amount
+                await db.collection('Users').updateOne(
+                    { accountNumber: sanitizedRecAccNo },
+                    { $inc: { balance: transferAmount * exchangeRate } },  // Apply converted amount to recipient
+                    { session }
+                );
             }
 
             // Insert the transaction record into the database
@@ -258,9 +283,6 @@ router.post("/payment", checkAuth, async (req, res) => {
         res.status(500).json({ message: messages.serverError });
     }
 });
-
-
-
 
 //===================================================================================================================================
 
