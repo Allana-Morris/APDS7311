@@ -72,8 +72,14 @@ router.post('/', async (req, res) => {
         const existingAccountNumber = await db.collection('Users').findOne({ accountNumber: parseInt(accountNumber, 10) });
         if (existingAccountNumber) return res.status(400).json({ message: messages.userExists });
 
-        // Check if username already exists
-        const existingUsername = await db.collection('Users').findOne({ userName });
+        const sanitizedUserName = validator.escape(userName);  // Escapes any potentially harmful characters
+
+        // Now you can safely use the sanitized `sanitizedUserName` in the database query
+        const existingUsername = await db.collection('Users').findOne({ userName: sanitizedUserName });
+
+        if (existingUsername) {
+            return res.status(400).json({ message: "Username already exists." });
+        }
         if (existingUsername) return res.status(400).json({ message: messages.usernameExists });
 
         // Hash the password securely
@@ -164,7 +170,7 @@ router.post("/payment", checkAuth, async (req, res) => {
 
     // Sanitize input fields
     const sanitizedSwift = validator.escape(swift);  // Escape potentially harmful characters
-    const sanitizedBranch = validator.escape(branch); 
+    const sanitizedBranch = validator.escape(branch);
     const sanitizedCurrency = validator.escape(currency);
 
     // Ensure all fields are valid and sanitized
@@ -205,7 +211,7 @@ router.post("/payment", checkAuth, async (req, res) => {
         // Wrap the transaction in a database transaction (for atomicity)
         const session = await db.startSession();
         session.startTransaction();
-        
+
         try {
             // Handle the transaction based on type (local vs. international)
             if (type === "local") {
