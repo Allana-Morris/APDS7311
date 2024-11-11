@@ -44,7 +44,6 @@ const messages = {
     invalidPaymentDetails: 'Invalid payment details.',
     paymentProcessed: 'Payment processed successfully.',
     serverError: 'An error occurred while processing payment.',
-    loginError: 'Incorrect username or password.',
     userNotFound: 'User not found.',
     serverloginError: 'An error occurred during login.'
 };
@@ -100,8 +99,8 @@ router.post('/', async (req, res) => {
 });
 
 router.post("/Login", bruteforce.prevent, async (req, res) => {
-
     const { username, accountNumber, password } = req.body;
+
     // Input validation
     if (username && !validateUsername(username)) {
         return res.status(400).json({ message: "Invalid username format." });
@@ -112,10 +111,19 @@ router.post("/Login", bruteforce.prevent, async (req, res) => {
     }
 
     try {
-        // Find the user by account number or username
-        const user = await db.collection("Users").findOne({
-            $or: [{ accountNumber: parseInt(accountNumber, 10) }, { userName: username }]
-        });
+        let query = {};
+
+        // Build the query only if inputs are provided
+        if (username) {
+            query.userName = username;  // username is validated
+        }
+
+        if (accountNumber) {
+            query.accountNumber = parseInt(accountNumber, 10);  // accountNumber is sanitized and converted to int
+        }
+
+        // Avoid direct use of user-controlled data in the query
+        const user = await db.collection("Users").findOne(query);
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ message: messages.loginError });
@@ -131,6 +139,7 @@ router.post("/Login", bruteforce.prevent, async (req, res) => {
         res.status(500).json({ message: messages.serverloginError });
     }
 });
+
 
 const validateAmount = (amount) => !isNaN(amount) && parseFloat(amount) > 0;
 const validateBankName = (bankName) => /^[a-zA-Z\s]+$/.test(bankName); // Only letters and spaces for bank names
@@ -153,6 +162,17 @@ router.post("/payment", checkAuth, async (req, res) => {
         return res.status(400).json({ message: messages.invalidPaymentDetails });
     }
 
+    // Sanitize input fields
+    const sanitizedSwift = validator.escape(swift);  // Escape potentially harmful characters
+    const sanitizedBranch = validator.escape(branch); 
+    const sanitizedCurrency = validator.escape(currency);
+
+    // Ensure all fields are valid and sanitized
+    const sanitizedRecAccNo = parseInt(recAccNo, 10);  // Ensure recipient account number is a number
+    if (isNaN(sanitizedRecAccNo)) {
+        return res.status(400).json({ message: "Invalid recipient account number format." });
+    }
+
     try {
         // Fetch sender's data from the database
         const sender = await db.collection('Users').findOne({ accountNumber: senderAccountNumber });
@@ -161,41 +181,73 @@ router.post("/payment", checkAuth, async (req, res) => {
         }
 
         // Fetch recipient's data (if necessary)
-        const recipient = await db.collection('Users').findOne({ accountNumber: recAccNo });
+        const recipient = await db.collection('Users').findOne({ accountNumber: sanitizedRecAccNo });
+
+        // If recipient does not exist, return an error
+        if (!recipient) {
+            return res.status(404).json({ message: "Recipient not found." });
+        }
 
         // Create the transaction object
         const transaction = {
             transactionId: `txn_${Date.now()}`,
             type,
             sender: senderAccountNumber,
-            recipient: { name: recName, bank: recBank, accountNumber: recAccNo },
+            recipient: { name: recName, bank: recBank, accountNumber: sanitizedRecAccNo },
             amount: transferAmount,
-            swift: validator.escape(swift),  // Escape any potentially harmful characters
-            branch: validator.escape(branch), // Escape the branch data
-            currency: validator.escape(currency), // Escape the currency data
-            approved: type === "local", // If it's a local payment, auto-approve
+            swift: sanitizedSwift,  // Use sanitized swift
+            branch: sanitizedBranch, // Use sanitized branch
+            currency: sanitizedCurrency, // Use sanitized currency
+            approved: type === "local", // Auto-approve if it's a local payment
             date: new Date()
         };
 
-        // Handle the transaction based on type (local vs. international)
-        if (type === "local") {
-            await db.collection('Users').updateOne({ accountNumber: senderAccountNumber }, { $inc: { balance: -transferAmount } });
-            if (recipient) {
-                await db.collection('Users').updateOne({ accountNumber: recAccNo }, { $inc: { balance: transferAmount } });
+        // Wrap the transaction in a database transaction (for atomicity)
+        const session = await db.startSession();
+        session.startTransaction();
+        
+        try {
+            // Handle the transaction based on type (local vs. international)
+            if (type === "local") {
+                // Update sender's balance
+                await db.collection('Users').updateOne(
+                    { accountNumber: senderAccountNumber },
+                    { $inc: { balance: -transferAmount } },
+                    { session }
+                );
+
+                // Update recipient's balance
+                await db.collection('Users').updateOne(
+                    { accountNumber: sanitizedRecAccNo },
+                    { $inc: { balance: transferAmount } },
+                    { session }
+                );
             }
+
+            // Insert the transaction record into the database
+            await db.collection('Transactions').insertOne(transaction, { session });
+
+            // Commit the transaction
+            await session.commitTransaction();
+
+            // Respond with a success message and transaction details
+            res.status(201).json({ message: messages.paymentProcessed, transaction });
+        } catch (error) {
+            // Abort the transaction on error
+            await session.abortTransaction();
+            console.error("Payment error:", error);
+            res.status(500).json({ message: messages.serverError });
+        } finally {
+            // End the session
+            session.endSession();
         }
-
-        // Insert the transaction record into the database
-        await db.collection('Transactions').insertOne(transaction);
-
-        // Respond with a success message and transaction details
-        res.status(201).json({ message: messages.paymentProcessed, transaction });
 
     } catch (error) {
         console.error("Payment error:", error);
         res.status(500).json({ message: messages.serverError });
     }
 });
+
 
 
 
