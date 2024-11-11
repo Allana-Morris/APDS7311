@@ -215,6 +215,11 @@ router.post("/payment", checkAuth, async (req, res) => {
         try {
             // Handle the transaction based on type (local vs. international)
             if (type === "local") {
+                // Validate sufficient funds before updating balances
+                if (sender.balance < transferAmount) {
+                    return res.status(400).json({ message: messages.insufficientFunds });
+                }
+
                 // Update sender's balance
                 await db.collection('Users').updateOne(
                     { accountNumber: senderAccountNumber },
