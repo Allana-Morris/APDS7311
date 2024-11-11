@@ -14,14 +14,17 @@ const bruteforce = new expressBrute(store);
 //getting out secret
 const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key'; //i dont think we actually have a fall back, but idk not my code
 
+// Regular expression for South African ID numbers (use correct pattern if needed)
+const southAfricanIDPattern = /^(?!000000)(\d{2})(\d{2})(\d{2})(\d{4})([01])(\d)(\d)$/;
 
-// User registration route
+// Validation functions
 const validateAccountNumber = (accountNumber) => /^\d{6,11}$/.test(accountNumber);
 const validatePassword = (password) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/.test(password);
 const validateEmail = (email) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co\.za)$/.test(email);
 const validateName = (name) => /^[a-zA-Z\s-]+$/.test(name);
+const validateUsername = (username) => /^[a-zA-Z0-9_-]{3,30}$/.test(username);
 
-// Centralize validation messages
+// Centralized validation messages
 const messages = {
     invalidName: 'Only letters, spaces, and hyphens are allowed in names.',
     invalidEmail: 'Please use a valid email format.',
@@ -37,11 +40,19 @@ const messages = {
     insufficientFunds: 'Insufficient funds.',
     invalidRecipientName: 'Recipient name must contain only letters.',
     invalidBankName: 'Bank name must contain only letters.',
-    branchCodeError: 'Branch code must be 3 to 5 alphanumeric characters.'
+    branchCodeError: 'Branch code must be 3 to 5 alphanumeric characters.',
+    invalidPaymentDetails: 'Invalid payment details.',
+    paymentProcessed: 'Payment processed successfully.',
+    serverError: 'An error occurred while processing payment.',
+    loginError: 'Incorrect username or password.',
+    userNotFound: 'User not found.',
+    serverloginError: 'An error occurred during login.'
 };
 
+// Validation function for user registration
 const validateUserRegistration = ({ firstName, lastName, userName, email, accountNumber, idNumber, password, confirmPassword }) => {
     if (![firstName, lastName, userName].every(validateName)) return { valid: false, message: messages.invalidName };
+    if (!validateUsername(userName)) return { valid: false, message: messages.loginError };
     if (!validateEmail(email)) return { valid: false, message: messages.invalidEmail };
     if (!validateAccountNumber(accountNumber)) return { valid: false, message: messages.invalidAccountNumber };
     if (!southAfricanIDPattern.test(idNumber)) return { valid: false, message: messages.invalidID };
@@ -52,21 +63,33 @@ const validateUserRegistration = ({ firstName, lastName, userName, email, accoun
 
 router.post('/', async (req, res) => {
     const { firstName, lastName, userName, email, password, confirmPassword, accountNumber, idNumber } = req.body;
+
+    // Validate user input
     const validationResult = validateUserRegistration({ firstName, lastName, userName, email, accountNumber, idNumber, password, confirmPassword });
     if (!validationResult.valid) return res.status(400).json({ message: validationResult.message });
 
     try {
+        // Check if account number already exists
         const existingAccountNumber = await db.collection('Users').findOne({ accountNumber: parseInt(accountNumber, 10) });
         if (existingAccountNumber) return res.status(400).json({ message: messages.userExists });
 
+        // Check if username already exists
         const existingUsername = await db.collection('Users').findOne({ userName });
         if (existingUsername) return res.status(400).json({ message: messages.usernameExists });
 
+        // Hash the password securely
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Insert new user into the database
         await db.collection('Users').insertOne({
-            firstName, lastName, userName, email,
-            password: hashedPassword, accountNumber: parseInt(accountNumber, 10),
-            idNumber, balance: 10000
+            firstName: validator.escape(firstName),   // Escape potential malicious characters
+            lastName: validator.escape(lastName),
+            userName: validator.escape(userName),
+            email: validator.normalizeEmail(email),
+            password: hashedPassword,
+            accountNumber: parseInt(accountNumber, 10),  // Ensure proper integer conversion
+            idNumber: validator.escape(idNumber),  // Escape ID number if necessary
+            balance: 10000
         });
 
         res.status(201).json({ message: messages.registrationSuccess });
@@ -77,53 +100,100 @@ router.post('/', async (req, res) => {
 });
 
 router.post("/Login", bruteforce.prevent, async (req, res) => {
+    
     const { username, accountNumber, password } = req.body;
+    // Input validation
+    if (username && !validateUsername(username)) {
+        return res.status(400).json({ message: "Invalid username format." });
+    }
+
+    if (accountNumber && !validateAccountNumber(accountNumber)) {
+        return res.status(400).json({ message: "Invalid account number format." });
+    }
 
     try {
-        const user = await db.collection("Users").findOne({ $or: [{ accountNumber }, { userName: username }] });
+        // Find the user by account number or username
+        const user = await db.collection("Users").findOne({
+            $or: [{ accountNumber: parseInt(accountNumber, 10) }, { userName: username }]
+        });
+
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ message: messages.loginError });
         }
 
+        // Generate JWT token
         const token = jwt.sign({ accountNumber: user.accountNumber }, jwtSecret, { expiresIn: "1h" });
+
+        // Send response
         res.status(200).json({ message: "Successful login", token, name: user.firstName });
     } catch (error) {
         console.error("Login error:", error);
-        res.status(500).json({ message: "An error occurred during login." });
+        res.status(500).json({ message: messages.serverloginError });
     }
 });
+
+const validateAmount = (amount) => !isNaN(amount) && parseFloat(amount) > 0;
+const validateBankName = (bankName) => /^[a-zA-Z\s]+$/.test(bankName); // Only letters and spaces for bank names
 
 router.post("/payment", checkAuth, async (req, res) => {
     const { type, recBank, recAccNo, amount, swift, branch, currency, recName } = req.body;
     const senderAccountNumber = req.user.accountNumber;
     const transferAmount = parseFloat(amount);
 
-    if (!type || !recBank || !recAccNo || isNaN(transferAmount) || transferAmount <= 0 || !validateName(recName) || !validateAccountNumber(recAccNo)) {
-        return res.status(400).json({ message: "Invalid payment details." });
+    // Validate the input fields
+    if (
+        !type ||
+        !recBank ||
+        !recAccNo ||
+        !validateAmount(amount) ||
+        !validateName(recName) ||
+        !validateAccountNumber(recAccNo) ||
+        !validateBankName(recBank)
+    ) {
+        return res.status(400).json({ message: messages.invalidPaymentDetails });
     }
 
     try {
+        // Fetch sender's data from the database
         const sender = await db.collection('Users').findOne({ accountNumber: senderAccountNumber });
-        if (!sender || sender.balance < transferAmount) return res.status(400).json({ message: messages.insufficientFunds });
-
-        const recipient = await db.collection('Users').findOne({ accountNumber: recAccNo });
-        const transaction = {
-            transactionId: `txn_${Date.now()}`, type, sender: senderAccountNumber,
-            recipient: { name: recName, bank: recBank, accountNumber: recAccNo },
-            amount: transferAmount, swift, branch, currency, approved: type === "local", date: new Date()
-        };
-
-        if (type === "local") {
-            await db.collection('Users').updateOne({ accountNumber: senderAccountNumber }, { $inc: { balance: -transferAmount } });
-            if (recipient) await db.collection('Users').updateOne({ accountNumber: recAccNo }, { $inc: { balance: transferAmount } });
+        if (!sender || sender.balance < transferAmount) {
+            return res.status(400).json({ message: messages.insufficientFunds });
         }
 
+        // Fetch recipient's data (if necessary)
+        const recipient = await db.collection('Users').findOne({ accountNumber: recAccNo });
+
+        // Create the transaction object
+        const transaction = {
+            transactionId: `txn_${Date.now()}`,
+            type,
+            sender: senderAccountNumber,
+            recipient: { name: recName, bank: recBank, accountNumber: recAccNo },
+            amount: transferAmount,
+            swift: validator.escape(swift),  // Escape any potentially harmful characters
+            branch: validator.escape(branch), // Escape the branch data
+            currency: validator.escape(currency), // Escape the currency data
+            approved: type === "local", // If it's a local payment, auto-approve
+            date: new Date()
+        };
+
+        // Handle the transaction based on type (local vs. international)
+        if (type === "local") {
+            await db.collection('Users').updateOne({ accountNumber: senderAccountNumber }, { $inc: { balance: -transferAmount } });
+            if (recipient) {
+                await db.collection('Users').updateOne({ accountNumber: recAccNo }, { $inc: { balance: transferAmount } });
+            }
+        }
+
+        // Insert the transaction record into the database
         await db.collection('Transactions').insertOne(transaction);
-        res.status(201).json({ message: "Payment processed.", transaction });
+
+        // Respond with a success message and transaction details
+        res.status(201).json({ message: messages.paymentProcessed, transaction });
 
     } catch (error) {
         console.error("Payment error:", error);
-        res.status(500).json({ message: "An error occurred while processing payment." });
+        res.status(500).json({ message: messages.serverError });
     }
 });
 
