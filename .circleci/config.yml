@@ -24,7 +24,7 @@ jobs:
   test-frontend:
     # Job to test frontend code
     executor: node/default
-    working_directory: ~/project/FRONTEND
+    working_directory: ~/project/frontend
     environment:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/frontend/
     steps:
