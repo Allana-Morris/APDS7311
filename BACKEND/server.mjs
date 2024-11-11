@@ -19,28 +19,13 @@ const options = {
 // Applying security headers with helmet and custom headers
 app.use(helmet());
 app.use((req, res, next) => {
-    //set security policy
     res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none';");
-  
-    //set content x options
-    res.setHeader('X-Content-Type-Options', 'nosniff'); // Prevents MIME type sniffing
-  
-    //sets x fram options
-    res.setHeader('X-Frame-Options', 'DENY'); // Prevents clickjacking by disallowing iframes
-  
-    //sets xxxss protection
-    res.setHeader('X-XSS-Protection', '1; mode=block'); // Enables XSS filtering
-  
-    //sets referer policy
-    res.setHeader('Referrer-Policy', 'no-referrer'); // Prevents the browser from sending the referrer header
-  
-    // sets strict transport security
-    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains'); // Enforces HTTPS
-  
-    // sets permissions policy
-    res.setHeader('Permissions-Policy', "geolocation=(self), microphone=(), camera=()"); // Limits feature access
-  
-    //start the next middleware
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('Permissions-Policy', "geolocation=(self), microphone=(), camera=()");
     next();
 });
 
